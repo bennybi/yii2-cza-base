@@ -39,9 +39,10 @@ class Bootstrap extends \yii\base\Component implements BootstrapInterface {
 //            ],
 //        ];
 //        
-//        $app->set('czaHelper', [
-//            'class' => '\cza\base\helpers\Helper',
-//        ]);
+        // declare CZA Helper
+        $app->set('czaHelper', [
+            'class' => '\cza\base\helpers\Helper',
+        ]);
     }
 
 }

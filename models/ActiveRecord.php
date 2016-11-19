@@ -28,6 +28,9 @@ use yii\behaviors\TimestampBehavior;
  */
 class ActiveRecord extends \yii\db\ActiveRecord {
 
+    const STATUS_INACTIVE = 0;
+    const STATUS_ACTIVE = 1;
+
     public function behaviors() {
         return [
             [
@@ -45,7 +48,7 @@ class ActiveRecord extends \yii\db\ActiveRecord {
         $name = $this->formName() . '-base-form';
         return $isId ? "#" . $name : $name;
     }
-    
+
     public function getDetailPjaxName($isId = false) {
         $name = $this->formName() . '-detail-pjax';
         return $isId ? "#" . $name : $name;

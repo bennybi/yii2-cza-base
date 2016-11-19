@@ -1,6 +1,3 @@
-/* Widget Control */
-
 $(document).ready(function () {
-//    $('.container').stickem();
-//    $('.fixed').makeFixed();
+    $('.select2').select2();  // apply select2 effection
 });

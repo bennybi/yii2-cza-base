@@ -23,6 +23,9 @@ class Widget extends \yii\base\Widget {
     const UI_BOOTSTRAP = 'bootstrap';
     const UI_JQUERYUI = 'jui';
 
+    private $_data = [];
+    protected $_controller = null;
+
     /**
      * @var array the HTML attributes for the widget container tag.
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
@@ -46,7 +49,6 @@ class Widget extends \yii\base\Widget {
     public $clientEvents = [];
     public $ui = SELF::UI_BOOTSTRAP;
     public $template;
-    protected $_controller = null;
 
     public function init() {
         parent::init();
@@ -54,7 +56,7 @@ class Widget extends \yii\base\Widget {
             $this->options['id'] = $this->getId();
         }
         if (empty($this->template)) {
-            $this->template = $this->formName();
+            $this->template = $this->shortClassName();
         }
     }
 
@@ -90,9 +92,11 @@ class Widget extends \yii\base\Widget {
      *
      * @return string the form name of this model class.
      */
-    public function formName() {
-        $reflector = new ReflectionClass($this);
-        return $reflector->getShortName();
+    public function shortClassName() {
+        if (!isset($this->_data['shortClassName'])) {
+            $this->_data['shortClassName'] = \Yii::$app->czaHelper->naming->shortClassName($this);
+        }
+        return $this->_data['shortClassName'];
     }
 
     /**
@@ -101,7 +105,10 @@ class Widget extends \yii\base\Widget {
      * @return type string
      */
     public function htmlId($name = '', $splitor = '-') {
-        return empty($name) ? strtolower(preg_replace("/(.)([A-Z])/", "$1{$splitor}$2", $this->formName())) : strtolower(preg_replace("/(.)([A-Z])/", "$1{$splitor}$2", $name));
+        if (!isset($this->_data['htmlId'])) {
+            $this->_data['htmlId'] = empty($name) ? strtolower(preg_replace("/(.)([A-Z])/", "$1{$splitor}$2", $this->shortClassName())) : strtolower(preg_replace("/(.)([A-Z])/", "$1{$splitor}$2", $name));
+        }
+        return $this->_data['htmlId'];
     }
 
     public function getTabWidget($config = []) {

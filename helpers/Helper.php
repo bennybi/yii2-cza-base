@@ -26,7 +26,7 @@ use yii\helpers\Url;
  * @property yii\web\AssetBundle AppAsset
  * 
  */
-class CzaHelper extends \yii\di\ServiceLocator {
+class Helper extends \yii\di\ServiceLocator {
 
     /**
      * @var array for data caching
@@ -59,13 +59,16 @@ class CzaHelper extends \yii\di\ServiceLocator {
      */
     public function coreComponents() {
         return [
-            'folderOrganizer' => [
-                'class' => '\cza\base\components\utils\FolderOrganizer',
-                'uploadFolderName' => isset(Yii::$app->params['config']['upload']['path']) ? Yii::$app->params['config']['upload']['path'] : 'uploads',
+            'naming' => [
+                'class' => '\cza\base\components\utils\Naming',
             ],
-            'simpleHTMLDOM' => [
-                'class' => '\cza\base\vendor\utils\SimpleHTMLDOM\SimpleHTMLDOM',
-            ],
+//            'folderOrganizer' => [
+//                'class' => '\cza\base\components\utils\FolderOrganizer',
+//                'uploadFolderName' => isset(Yii::$app->params['config']['upload']['path']) ? Yii::$app->params['config']['upload']['path'] : 'uploads',
+//            ],
+//            'simpleHTMLDOM' => [
+//                'class' => '\cza\base\vendor\utils\SimpleHTMLDOM\SimpleHTMLDOM',
+//            ],
         ];
     }
 
@@ -94,29 +97,31 @@ class CzaHelper extends \yii\di\ServiceLocator {
             $view = \Yii::$app->getView();
         }
         \cza\base\assets\AppAsset::register($view);
-        \cza\base\vendor\assets\MsgGrowl\MsgGrowlAsset::register($view);
     }
 
     /**
      * set current application asset url
      */
     public function setBackendAssetUrl($url) {
-        $this->_data['env']['BACKEND_ASSETS_URL'] = $url;
+        $key = "BACKEND_ASSETS_URL";
+        $value = $url;
+        return $this->setEnvData($key, $value);
     }
 
     /**
      * get current application asset url
      * @return string
      */
-    public function getBackendAssetUrl($asset = '') {
-        if (isset($this->_data['env']['BACKEND_ASSETS_URL'])) {
-            return $this->_data['env']['BACKEND_ASSETS_URL'];
-        }
-
-        $bundle = Yii::$app->getAssetManager()->getBundle('backend\themes\\' . CCA2_BACKEND_THEME . '\components\AppAsset');
-        $this->_data['env']['BACKEND_ASSETS_URL'] = Yii::$app->getAssetManager()->getAssetUrl($bundle, $asset);
-        return $this->_data['env']['BACKEND_ASSETS_URL'];
-    }
+//    public function getBackendAssetUrl($asset = '') {
+//        if (isset($this->_data['env']['BACKEND_ASSETS_URL'])) {
+//            return $this->_data['env']['BACKEND_ASSETS_URL'];
+//        }
+//
+//        $bundle = Yii::$app->getAssetManager()->getBundle('backend\themes\\' . CCA2_BACKEND_THEME . '\components\AppAsset');
+//        $key = "BACKEND_ASSETS_URL";
+//        $value = Yii::$app->getAssetManager()->getAssetUrl($bundle, $asset);
+//        return $this->setEnvData($key, $value);
+//    }
 
     /**
      * 
@@ -141,6 +146,34 @@ class CzaHelper extends \yii\di\ServiceLocator {
     }
 
     /**
+     * 
+     * @param string $key
+     * @return null or sth else
+     */
+    public function setEnvData($key, $value, $caching = true, $duration = 0) {
+        if ($caching) {
+            return $this->cachingEnvVariables($key, $value, $duration);
+        } else {
+            if ($this->_data['env'][$key] === false) {
+                $this->_data['env'][$key] = is_callable($value) ? call_user_func($value) : $value;
+            }
+            return $this->_data['env'][$key];
+        }
+    }
+
+    /**
+     * 
+     * @param string $key
+     * @return null or sth else
+     */
+    public function getEnvData($key) {
+        if (isset($this->_data['env'][$key])) {
+            return $this->_data['env'][$key];
+        }
+        return null;
+    }
+
+    /**
      *
      * @param type $size - 64, 54, 48, 32
      * @param type $absolute
@@ -151,10 +184,9 @@ class CzaHelper extends \yii\di\ServiceLocator {
             return $this->_data['env']["logo_{$size}x{$size}"];
         }
 
-        $logo = "logo_{$size}x{$size}.png";
-        $this->_data['env']["logo_{$size}x{$size}"] = Url::to("@web/images/cciza_logo/{$logo}");
-//        $this->_data['env']["logo_{$size}x{$size}"] = Url::home() . "images/cciza_logo/{$logo}";
-        return $this->_data['env']["logo_{$size}x{$size}"];
+        $key = "logo_{$size}x{$size}.png";
+        $value = Url::to("@web/images/cciza_logo/{$logo}");
+        return $this->setEnvData($key, $value);
     }
 
     /**
@@ -166,11 +198,7 @@ class CzaHelper extends \yii\di\ServiceLocator {
     public function cachingEnvVariables($key, $value, $duration = 0) {
         $this->_data['env'][$key] = Yii::$app->cache->get("ENV_{$key}");
         if ($this->_data['env'][$key] === false) {
-            if (is_callable($value)) {
-                $this->_data['env'][$key] = call_user_func($value);
-            } else {
-                $this->_data['env'][$key] = $value;
-            }
+            $this->_data['env'][$key] = is_callable($value) ? call_user_func($value) : $value;
             Yii::$app->cache->set("ENV_{$key}", $this->_data['env'][$key], $duration);
         }
         return $this->_data['env'][$key];

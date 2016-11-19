@@ -21,7 +21,12 @@
         "yiisoft/yii2-bootstrap": "@dev",
         "dmstr/yii2-adminlte-asset": "*",
         "almasaeed2010/adminlte": "~2.0",
-        "rmrevin/yii2-fontawesome": "~2.9"
+        "rmrevin/yii2-fontawesome": "~2.9",
+        
+        "kartik-v/yii2-editable": "*",
+        "kartik-v/yii2-widget-select2": "@dev",
+        "yii2tech/ar-linkmany": "*",
+        "yii2tech/ar-position": "*"
     },
     "autoload": {
         "psr-4": {

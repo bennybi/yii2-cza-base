@@ -3,63 +3,61 @@
 namespace cza\base\widgets\menu;
 
 use Yii;
-use yii\base\InvalidCallException;
-use yii\base\Model;
-use yii\helpers\Html;
-use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
+use yii\helpers\Html;
 
 /**
- * Sub Naviation Bar Widget
- * depends on bootstrap & jquery lib, for bootstrap 3.0
- * 
- * 
- * @author Ben Bi <ben@cciza.com>
- * @link http://www.cciza.com/
- * @copyright 2014-2016 CCIZA Software LLC
- * @license
+ * Class Menu
+ * Theme menu widget.
  */
 class Menu extends \yii\widgets\Menu {
 
-    public $labelTemplate = '{icon}<span>{label}</span>';
-    public $itemSubmenuLabelTemplate = '<a href="#" class="dropdown-toggle" data-toggle="dropdown">{icon}<span>{label}</span><b class="caret"></b></a>';
-    public $linkTemplate = '<a href="{url}">{icon}<span>{label}</span></a>';
-    public $itemSubmenuLinkTemplate = '<a href="{url}" class="dropdown-toggle">{icon}<span>{label}</span><b class="caret"></b></a>';
-//    public $submenuTemplate = "\n<ul class='dropdown-menu'>\n{items}\n</ul>\n";
-//    public $options = ['class' => 'mainnav'];
-    public $activateParents = true;
-    public $primaryMenuCssClass = 'dropdown';
-    public $subMenuCssClass = 'dropdown';
-
-    /*
-     * count menu layers
+    /**
+     * @inheritdoc
      */
-    protected $_layer = 0;
+    public $linkTemplate = '<a href="{url}" {targetPlaceHolder}>{icon} {label}</a>';
+    public $submenuTemplate = "\n<ul class='treeview-menu' {show}>\n{items}\n</ul>\n";
+    public $activateParents = true;
 
-//    public function run() {
-//        if ($this->route === null && Yii::$app->controller !== null) {
-//            $this->route = Yii::$app->controller->getRoute();
-//        }
-//        if ($this->params === null) {
-//            $this->params = Yii::$app->request->getQueryParams();
-//        }
-//
-//        echo Html::beginTag('div', ['id' => 'subnavbar-container', 'class' => 'subnavbar']) . "\n";
-//        echo Html::beginTag('div', ['id' => 'subnavbar-inner', 'class' => 'subnavbar-inner']) . "\n";
-//        echo Html::beginTag('div', ['id' => 'subnavbar-inner-container', 'class' => 'container']) . "\n";
-//
-//        $items = $this->normalizeItems($this->items, $hasActiveChild);
-//
-//        if (!empty($items)) {
-//            $options = $this->options;
-//            $tag = ArrayHelper::remove($options, 'tag', 'ul');
-//            echo Html::tag($tag, $this->renderItems($items), $options);
-//        }
-//
-//        echo Html::endTag('div') . "\n";
-//        echo Html::endTag('div') . "\n";
-//        echo Html::endTag('div') . "\n";
-//    }
+    /**
+     * @inheritdoc
+     */
+    protected function renderItem($item) {
+        if (isset($item['items'])) {
+            $labelTemplate = '<a href="{url}" {targetPlaceHolder}>{label} <i class="fa fa-angle-left pull-right"></i></a>';
+            $linkTemplate = '<a href="{url}" {targetPlaceHolder}>{icon} {label} <i class="fa fa-angle-left pull-right"></i></a>';
+        } else {
+            $labelTemplate = $this->labelTemplate;
+            $linkTemplate = $this->linkTemplate;
+        }
+
+        if (isset($item['url'])) {
+            $template = ArrayHelper::getValue($item, 'template', $linkTemplate);
+            $replace = !empty($item['icon']) ? [
+                '{url}' => Url::to($item['url']),
+                '{label}' => '<span>' . $item['label'] . '</span>',
+                '{targetPlaceHolder}' => isset($item['target']) ? "target='{$item['target']}'" : '',
+                '{icon}' => '<i class="' . $item['icon'] . '"></i> '
+                    ] : [
+                '{url}' => Url::to($item['url']),
+                '{label}' => '<span>' . $item['label'] . '</span>',
+                '{targetPlaceHolder}' => isset($item['target']) ? "target='{$item['target']}'" : '',
+                '{icon}' => null,
+            ];
+            
+            return strtr($template, $replace);
+        } else {
+            $template = ArrayHelper::getValue($item, 'template', $labelTemplate);
+            $replace = !empty($item['icon']) ? [
+                '{label}' => '<span>' . $item['label'] . '</span>',
+                '{icon}' => '<i class="' . $item['icon'] . '"></i> '
+                    ] : [
+                '{label}' => '<span>' . $item['label'] . '</span>',
+            ];
+            return strtr($template, $replace);
+        }
+    }
 
     /**
      * Recursively renders the menu items (without the container tag).
@@ -73,7 +71,6 @@ class Menu extends \yii\widgets\Menu {
             $options = array_merge($this->itemOptions, ArrayHelper::getValue($item, 'options', []));
             $tag = ArrayHelper::remove($options, 'tag', 'li');
             $class = [];
-
             if ($item['active']) {
                 $class[] = $this->activeCssClass;
             }
@@ -82,9 +79,6 @@ class Menu extends \yii\widgets\Menu {
             }
             if ($i === $n - 1 && $this->lastItemCssClass !== null) {
                 $class[] = $this->lastItemCssClass;
-            }
-            if (!empty($item['items'])) {
-                $class[] = ($this->_layer > 0) ? $this->subMenuCssClass : $this->primaryMenuCssClass;
             }
             if (!empty($class)) {
                 if (empty($options['class'])) {
@@ -95,45 +89,53 @@ class Menu extends \yii\widgets\Menu {
             }
             $menu = $this->renderItem($item);
             if (!empty($item['items'])) {
-                $this->_layer++;
                 $menu .= strtr($this->submenuTemplate, [
+                    '{show}' => $item['active'] ? "style='display: block'" : '',
                     '{items}' => $this->renderItems($item['items']),
                 ]);
-                $this->_layer--;
             }
             $lines[] = Html::tag($tag, $menu, $options);
         }
-
         return implode("\n", $lines);
     }
 
     /**
-     * Renders the content of a menu item.
-     * Note that the container and the sub-menus are not rendered here.
-     * @param array $item the menu item to be rendered. Please refer to [[items]] to see what data might be in the item.
-     * @return string the rendering result
+     * @inheritdoc
      */
-    protected function renderItem($item) {
-        $linkTemplate = empty($item['items']) ? $this->linkTemplate : $this->itemSubmenuLinkTemplate;
-        $labelTemplate = empty($item['items']) ? $this->labelTemplate : $this->itemSubmenuLabelTemplate;
-        if (isset($item['url'])) {
-            $template = ArrayHelper::getValue($item, 'template', $linkTemplate);
-
-            $params = [
-                '{url}' => Html::encode(Url::to($item['url'])),
-                '{label}' => $item['label'],
-                '{icon}' => isset($item['icon']) ? "<i class='{$item['icon']}'></i>" : '',
-            ];
-
-            return strtr($template, $params);
-        } else {
-            $template = ArrayHelper::getValue($item, 'template', $labelTemplate);
-
-            return strtr($template, [
-                '{label}' => $item['label'],
-                '{icon}' => isset($item['icon']) ? "<i class='{$item['icon']}'></i>" : '',
-            ]);
+    protected function normalizeItems($items, &$active) {
+        foreach ($items as $i => $item) {
+            if (isset($item['visible']) && !$item['visible']) {
+                unset($items[$i]);
+                continue;
+            }
+            if (!isset($item['label'])) {
+                $item['label'] = '';
+            }
+            $encodeLabel = isset($item['encode']) ? $item['encode'] : $this->encodeLabels;
+            $items[$i]['label'] = $encodeLabel ? Html::encode($item['label']) : $item['label'];
+            $items[$i]['icon'] = isset($item['icon']) ? $item['icon'] : '';
+            $hasActiveChild = false;
+            if (isset($item['items'])) {
+                $items[$i]['items'] = $this->normalizeItems($item['items'], $hasActiveChild);
+                if (empty($items[$i]['items']) && $this->hideEmptyItems) {
+                    unset($items[$i]['items']);
+                    if (!isset($item['url'])) {
+                        unset($items[$i]);
+                        continue;
+                    }
+                }
+            }
+            if (!isset($item['active'])) {
+                if ($this->activateParents && $hasActiveChild || $this->activateItems && $this->isItemActive($item)) {
+                    $active = $items[$i]['active'] = true;
+                } else {
+                    $items[$i]['active'] = false;
+                }
+            } elseif ($item['active']) {
+                $active = true;
+            }
         }
+        return array_values($items);
     }
 
     /**
@@ -146,32 +148,34 @@ class Menu extends \yii\widgets\Menu {
      * @param array $item the menu item to be checked
      * @return boolean whether the menu item is active
      */
-//    protected function isItemActive($item) {
-//        if (isset($item['url']) && is_array($item['url']) && isset($item['url'][0])) {
-//            $route = $item['url'][0];
-//            if ($route[0] !== '/' && Yii::$app->controller) {
-//                $route = Yii::$app->controller->module->getUniqueId() . '/' . $route;
-//            }
-//
-//            if (strpos(Yii::$app->request->getUrl(), $item['url'][0]) !== false) {
-//                return true;
-//            }
-//            if (ltrim($route, '/') !== $this->route) {
-//                return false;
-//            }
-//            unset($item['url']['#']);
-//            if (count($item['url']) > 1) {
-//                foreach (array_splice($item['url'], 1) as $name => $value) {
-//                    if ($value !== null && (!isset($this->params[$name]) || $this->params[$name] != $value)) {
-//                        return false;
-//                    }
-//                }
-//            }
-//
-//            return true;
-//        }
-//
-//        return false;
-//    }
+    protected function isItemActive($item) {
+        if (isset($item['url']) && is_array($item['url']) && isset($item['url'][0])) {
+            $route = $item['url'][0];
+            if ($route[0] !== '/' && Yii::$app->controller) {
+                $route = Yii::$app->controller->module->getUniqueId() . '/' . $route;
+            }
+            $arrayRoute = explode('/', ltrim($route, '/'));
+            $arrayThisRoute = explode('/', $this->route);
+            if ($arrayRoute[0] !== $arrayThisRoute[0]) {
+                return false;
+            }
+            if (isset($arrayRoute[1]) && $arrayRoute[1] !== $arrayThisRoute[1]) {
+                return false;
+            }
+            if (isset($arrayRoute[2]) && $arrayRoute[2] !== $arrayThisRoute[2]) {
+                return false;
+            }
+            unset($item['url']['#']);
+            if (count($item['url']) > 1) {
+                foreach (array_splice($item['url'], 1) as $name => $value) {
+                    if ($value !== null && (!isset($this->params[$name]) || $this->params[$name] != $value)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 
 }
