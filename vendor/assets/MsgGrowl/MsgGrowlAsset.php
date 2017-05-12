@@ -21,6 +21,12 @@ class MsgGrowlAsset extends AssetBundle {
 
     public $sourcePath = '@cza/base/vendor/assets/MsgGrowl/src';
 
+    /**
+     * @inheritdoc
+     */
+    public $publishOptions = [
+        'forceCopy' => YII_DEBUG,
+    ];
     public $css = [
         'css/msgGrowl.css',
     ];

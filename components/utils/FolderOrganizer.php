@@ -5,6 +5,7 @@ namespace cza\base\components\utils;
 use Yii;
 use yii\helpers\Url;
 use yii\base\Exception;
+use yii\helpers\FileHelper;
 
 /**
  * service folder organization
@@ -18,9 +19,100 @@ use yii\base\Exception;
 class FolderOrganizer extends \yii\base\Component {
 
     protected $_data = [];
-    
     public $uploadFolderName = 'uploads';
     public $cachingLayer = 2;
+    public $uploadTempPath;
+    public $uploadStorePath;
+    public $fullUploadStoreDirPattern = "{uploadDir}{logicPath}{filename}";
+
+    public function init() {
+        parent::init();
+    }
+
+    public function getUploadTempPath() {
+        return \Yii::getAlias($this->uploadTempPath);
+    }
+
+    public function getUploadStorePath() {
+        return \Yii::getAlias($this->uploadStorePath);
+    }
+
+    public function getUploadStoreUrl() {
+        if (!isset($this->_data['uploadStoreUrl'])) {
+            $this->_data['uploadStoreUrl'] = isset(Yii::$app->params['config']['upload']['accessUrl']) ? Yii::$app->params['config']['upload']['accessUrl'] . '/' . $this->getPathUnderWeb($this->getUploadStorePath()) : Yii::$app->homeUrl . $this->getPathUnderWeb($this->getUploadStorePath());
+        }
+        return $this->_data['uploadStoreUrl'];
+    }
+
+    public function getPathUnderWeb($path) {
+        return substr($path, strrpos($path, 'web') + 4);
+    }
+
+    public function getSubDirs($fileHash, $depth = 1) {
+        $depth = min($depth, 9);
+        $path = '';
+
+        for ($i = 0; $i < $depth; $i++) {
+            $folder = substr($fileHash, $i * 3, 2);
+            $path .= $folder;
+            if ($i != $depth - 1)
+                $path .= '/';
+        }
+
+        return $path;
+    }
+
+    public function getUserTempDirPath() {
+        \Yii::$app->session->open();
+
+        $userDirPath = $this->getUploadTempPath() . '/' . \Yii::$app->session->id;
+        FileHelper::createDirectory($userDirPath);
+
+        \Yii::$app->session->close();
+
+        return $userDirPath . '/';
+    }
+
+    public function getFullUploadStoreDir($fileHash, $entityModel = null) {
+        $path = strtr($this->fullUploadStoreDirPattern, [
+            "{uploadDir}" => $this->getUploadStorePath() . '/',
+            "{logicPath}" => $this->getUploadLogicPath($fileHash, $entityModel),
+            "{filename}" => "",
+        ]);
+        if (!\file_exists($path)) {
+            FileHelper::createDirectory($path);
+        }
+        return $path;
+    }
+
+    /**
+     * return file store path by EntityFile model
+     * @param type $model - file model
+     * @return string file full path, inculding filename
+     */
+    public function getFullUploadStorePath($model) {
+        $path = strtr($this->fullUploadStoreDirPattern, [
+            "{uploadDir}" => $this->getUploadStorePath() . '/',
+            "{logicPath}" => $model->getLogicPath(),
+            "{filename}" => $model->getHashFileName(),
+        ]);
+        return $path;
+    }
+
+    public function getUploadLogicPath($fileHash, $entityModel = null, $depth = 1) {
+        if (isset($this->_data['LOGIC_PATH'][$fileHash])) {
+            return $this->_data['LOGIC_PATH'][$fileHash];
+        }
+
+        $logicPath = "";
+        if (is_null($entityModel)) {
+            $logicPath = $this->getSubDirs($fileHash, $depth) . '/';
+        } else {
+            $logicPath = $entityModel->formName() . '/' . $entityModel->id . '/' . $this->getSubDirs($fileHash, $depth) . '/';
+        }
+        $this->_data['LOGIC_PATH'][$fileHash] = $logicPath;
+        return $this->_data['LOGIC_PATH'][$fileHash];
+    }
 
     /**
      * Return upload path
@@ -36,7 +128,7 @@ class FolderOrganizer extends \yii\base\Component {
             return $this->_data['REV_UPLOAD_PATH'];
         }
 
-        $path = Yii::getAlias('@webroot') . DIRECTORY_SEPARATOR . $this->uploadFolderName;
+        $path = Yii::getAlias('@webroot') . '/' . $this->uploadFolderName;
         if (!@file_exists($path)) {
             if (!@mkdir($path, $createMode, true)) {
                 throw new Exception("Cannot create dir: {$path}");
@@ -83,7 +175,7 @@ class FolderOrganizer extends \yii\base\Component {
         }
 
         $folderName = !is_null($model) ? $model->className() : $defaultName;
-        $path = $this->getUploadPath(true) . DIRECTORY_SEPARATOR . $folderName;
+        $path = $this->getUploadPath(true) . '/' . $folderName;
         if (!@file_exists($path)) {
             if (!@mkdir($path, $createMode, true)) {
                 throw new Exception("Cannot create dir: {$path}");

@@ -9,11 +9,13 @@ use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
+//use yii\web\Controller;
 use cza\base\filters\CmsMediaFilter;
 use cza\base\behaviors\CmsMediaBehavior;
+use cza\base\models\statics\ResponseDatum;
 
 /**
- * service cms content control
+ * for model CRUD usage.
  *
  *
  * @author Ben Bi <ben@cciza.com>
@@ -21,14 +23,25 @@ use cza\base\behaviors\CmsMediaBehavior;
  * @copyright 2014-2016 CCIZA Software LLC
  * @license
  */
-class ModelController extends \yii\rest\ActiveController {
+class ModelController extends Controller {
 
-    public function behaviors() {
-        $behaviors = parent::behaviors();
-        $behaviors['contentNegotiator']['formats']['text/html'] = Response::FORMAT_HTML;
-//        $behaviors['contentNegotiator']['languages'] = [ 'en', 'zh-CN',];
+    /**
+     * @var string the model class name. This property must be set.
+     */
+    public $modelClass;
 
-        return $behaviors;
+    public function actions() {
+        return \yii\helpers\ArrayHelper::merge(parent::actions(), [
+                    'editColumn' => [                                       // identifier for your editable action
+                        'class' => \kartik\grid\EditableColumnAction::className(), // action class name
+                        'modelClass' => $this->modelClass, // the update model class
+                    ],
+                    'translation-save' => [
+                        'class' => '\cza\base\components\actions\backend\TranslationSaveAction',
+                        'modelClass' => $this->modelClass,
+                        'checkAccess' => [$this, 'checkAccess'],
+                    ],
+        ]);
     }
 
     /**
@@ -41,36 +54,38 @@ class ModelController extends \yii\rest\ActiveController {
     }
 
     /**
-     * 
-     * @param type $id
-     * @param type $allowReturnNew
-     * @return \cza\base\components\controllers\backend\modelClass
-     * @throws NotFoundHttpException
+     * accept $id or $expandRowKey as model PK params
+     * compatible with Karik grid detail request params
+     * @return string
      */
-    public function retrieveModel($id = null, $allowReturnNew = true) {
-        if (!is_null($id)) {
-            $model = $this->findModel($id);
-        } elseif (!$allowReturnNew) {
-            throw new NotFoundHttpException('The requested page does not exist.');
+    public function actionDetail() {
+        $request = Yii::$app->request;
+        if (!is_null($id = $request->post('id', $request->post('expandRowKey')))) {
+            $model = $this->retrieveModel($id);
+            return $this->renderPartial('_detail', ['model' => $model]);
         } else {
-            $model = new $this->modelClass;
-            $model->loadDefaultValues();
+            return '<div class="alert alert-danger">No data found</div>';
         }
-
-        return $model;
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function verbs() {
-        return \yii\helpers\ArrayHelper::merge(parent::verbs(), [
-                    'index' => ['GET', 'HEAD'],
-                    'view' => ['GET', 'HEAD'],
-                    'create' => ['GET', 'POST', 'PUT', 'PATCH'],
-                    'update' => ['GET', 'POST', 'PUT', 'PATCH'],
-                    'delete' => ['GET', 'POST', 'DELETE'],
-        ]);
+    public function actionMultipleDelete(array $ids) {
+        $model = $this->retrieveModel();
+        $model->multipleDeleteByIds($ids);
+        if (true) {
+            $responseData = ResponseDatum::getSuccessDatum(['message' => Yii::t('cza', 'Operation completed successfully!')], $ids);
+        } else {
+            $responseData = ResponseDatum::getErrorDatum(['message' => Yii::t('cza', 'Error: operation can not finish!!')], $ids);
+        }
+        return $this->asJson($responseData);
+    }
+
+    public function actionDelete($id) {
+        if ($this->findModel($id)->delete()) {
+            $responseData = ResponseDatum::getSuccessDatum(['message' => Yii::t('cza', 'Operation completed successfully!')], $id);
+        } else {
+            $responseData = ResponseDatum::getErrorDatum(['message' => Yii::t('cza', 'Error: operation can not finish!!')], $id);
+        }
+        return $this->asJson($responseData);
     }
 
 }

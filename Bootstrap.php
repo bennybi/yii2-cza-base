@@ -29,16 +29,16 @@ class Bootstrap extends \yii\base\Component implements BootstrapInterface {
 //        \Yii::info(__CLASS__);
 //        $app->attachBehavior('AppConfigBehavior', 'cza\base\behaviors\AppConfigBehavior');
 //        
-//        $app->i18n->translations['cza*'] = [
-//            'class' => 'yii\i18n\PhpMessageSource',
-//            'sourceLanguage' => 'en-US',
-//            'basePath' => '@cza/base/messages',
-//            'fileMap' => [
-//                'cza' => 'default.php',
-//                'cza/languages' => 'languages.php',
-//            ],
-//        ];
-//        
+        $app->i18n->translations['cza*'] = [
+            'class' => 'yii\i18n\PhpMessageSource',
+            'sourceLanguage' => 'en-US',
+            'basePath' => '@cza/base/messages',
+            'fileMap' => [
+                'cza' => 'default.php',
+                'cza/languages' => 'languages.php',
+            ],
+        ];
+        
         // declare CZA Helper
         $app->set('czaHelper', [
             'class' => '\cza\base\helpers\Helper',

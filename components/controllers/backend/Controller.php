@@ -24,6 +24,8 @@ use cza\base\behaviors\CmsMediaBehavior;
  */
 class Controller extends \yii\web\Controller {
 
+    public $modelClass;
+
     /**
      * @inheritdoc
      */
@@ -103,13 +105,21 @@ class Controller extends \yii\web\Controller {
      * @inheritdoc
      */
     protected function verbs() {
-        return \yii\helpers\ArrayHelper::merge(parent::verbs(), [
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
                     'index' => ['GET', 'HEAD'],
                     'view' => ['GET', 'HEAD'],
                     'create' => ['GET', 'POST', 'PUT', 'PATCH'],
                     'update' => ['GET', 'POST', 'PUT', 'PATCH'],
                     'delete' => ['GET', 'POST', 'DELETE'],
-        ]);
+                    'edit' => ['post'],
+                    'delete-multiple' => ['post'],
+                ],
+            ],
+        ];
+       
     }
 
 }

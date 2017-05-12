@@ -25,7 +25,7 @@ use yii\helpers\Json;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class ActiveForm extends \yii\widgets\ActiveForm {
+class ActiveForm extends \yii\bootstrap\ActiveForm {
 
     /**
      * @var string the default field class name when calling [[field()]] to create a new field.
@@ -33,6 +33,40 @@ class ActiveForm extends \yii\widgets\ActiveForm {
      */
     public $fieldClass = 'cza\base\widgets\ActiveField';
     public $model;
+    
+    public function juiField($model, $attribute, $options = [])
+    {
+        $this->fieldClass = 'cza\base\widgets\ui\jui\ActiveField';
+        return parent::field($model, $attribute, $options);
+    }
+    
+    /**
+     * Generates a form field by multiple model attributes.
+     * 
+     * @param Model $model the data model.
+     * @param array $attribute the attribute name or expression. See [[Html::getAttributeName()]] for the format
+     * about attribute expression.
+     * @param array $options the additional configurations for the field object. These are properties of [[ActiveField]]
+     * or a subclass, depending on the value of [[fieldClass]].
+     * @return ActiveField the created ActiveField object.
+     * @see fieldConfig
+     */
+    public function fields($model, $attributes, $options = [])
+    {
+        $config = $this->fieldConfig;
+        if ($config instanceof \Closure) {
+            $config = call_user_func($config, $model, $attributes);
+        }
+        if (!isset($config['class'])) {
+            $config['class'] = $this->fieldClass;
+        }
+        return Yii::createObject(ArrayHelper::merge($config, $options, [
+            'model' => $model,
+            'attributes' => $attributes,
+            'enableLabel' => false,
+            'form' => $this,
+        ]));
+    }
 
     public function getAjaxJs() {
         $js = "jQuery('form#{$this->options['id']}').on('beforeSubmit', function(e) {

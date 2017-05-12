@@ -76,8 +76,6 @@ class CmsController extends ModelController {
      */
     protected function verbs() {
         return \yii\helpers\ArrayHelper::merge(parent::verbs(), [
-                    'index' => ['GET', 'HEAD'],
-                    'view' => ['GET', 'HEAD'],
                     'create' => ['GET', 'POST', 'PUT', 'PATCH'],
                     'update' => ['GET', 'POST', 'PUT', 'PATCH'],
                     'delete' => ['GET', 'POST', 'DELETE'],

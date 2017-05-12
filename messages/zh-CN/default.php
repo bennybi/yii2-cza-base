@@ -11,6 +11,11 @@ return [
     'Disallow access in create mode' => '在新建模式下谢绝访问',
     'Operation completed successfully!' => '操作成功完成！',
     'Language ({s1}) not found!' => '没找到语言({s1})支持！',
-    'Srouce model not found!' => '源对象没找到！',
+    'Associated entity not found!' => '关联对象没找到！',
     'Tips' => '提示',
+    'Alert' => '特别提示',
+    'Warning' => '警告',
+    'File {s1} not existed!' => '文件{s1}不存在!',
+    '{attribute} must be alphanumeric.' => '{attribute}必须全是字母或数字.',
+    '' => '',
 ];

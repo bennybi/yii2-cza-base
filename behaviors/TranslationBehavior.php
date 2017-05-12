@@ -73,7 +73,7 @@ class TranslationBehavior extends Behavior {
      */
     public function __set($name, $value) {
         if (in_array($name, $this->translationAttributes)) {
-            $this->getTranslation()->$name = $value;
+            $this->getTranslationModel()->$name = $value;
         } else {
             parent::__set($name, $value);
         }
@@ -90,7 +90,7 @@ class TranslationBehavior extends Behavior {
         if (isset($this->_models[$name])) {
             return $this->_models[$name];
         }
-        $model = $this->getTranslation();
+        $model = $this->getTranslationModel();
         return $model->$name;
     }
 
@@ -115,7 +115,7 @@ class TranslationBehavior extends Behavior {
      */
     public function afterFind($event) {
         $this->populateTranslations();
-        $this->getTranslation($this->getLanguage());
+        $this->getTranslationModel($this->getLanguage());
     }
 
     /**
@@ -161,7 +161,7 @@ class TranslationBehavior extends Behavior {
      * @return bool
      */
     public function saveTranslation($language, $data, $formName = null) {
-        $model = $this->getTranslation($language);
+        $model = $this->getTranslationModel($language);
         $model->load($data, $formName);
         $dirty = $model->getDirtyAttributes();
        
@@ -188,7 +188,7 @@ class TranslationBehavior extends Behavior {
      *
      * @return ActiveRecord
      */
-    public function getTranslation($language = null) {
+    public function getTranslationModel($language = null) {
         if ($language === null) {
             $language = $this->getLanguage();
         }
@@ -230,6 +230,7 @@ class TranslationBehavior extends Behavior {
         $relation = $this->owner->getRelation($this->relation);
         /** @var ActiveRecord $class */
         $class = $relation->modelClass;
+        $language = strtolower($language);
         if ($this->owner->getPrimarykey()) {
             $translation = $class::findOne(
                             [$this->languageField => $language, key($relation->link) => $this->owner->getPrimarykey()]

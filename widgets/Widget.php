@@ -114,13 +114,13 @@ class Widget extends \yii\base\Widget {
     public function getTabWidget($config = []) {
         switch ($this->ui) {
             case Widget::UI_BOOTSTRAP:
-                return \cza\base\widgets\form\Tabs::widget($config);
+                return \cza\base\widgets\common\form\Tabs::widget($config);
                 break;
             case Widget::UI_JQUERYUI:
                 return \yii\jui\Tabs::widget($config);
                 break;
             default:
-                return \cza\base\widgets\form\Tabs::widget($config);
+                return \cza\base\widgets\common\form\Tabs::widget($config);
                 break;
         }
     }

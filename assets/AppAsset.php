@@ -20,23 +20,21 @@ use yii\web\AssetBundle;
 class AppAsset extends AssetBundle {
 
     public $sourcePath = '@cza/base/assets/src';
+    public $publishOptions = [
+        'forceCopy' => YII_DEBUG,
+    ];
     public $css = [
-        //  https://github.com/select2/select2
-//        'plugins/select2/css/select2.min.css',
-        // cza
-        'css/cza.css',
+        'css/cza.css', // cza
     ];
     public $js = [
-        // https://github.com/select2/select2
-//        'plugins/select2/js/select2.full.min.js',
-        // cza
-//        'js/cza.app.js',
+        'js/cza.app.js', // cza
     ];
     public $depends = [
         'yii\web\YiiAsset',
         'yii\widgets\ActiveFormAsset',
         'yii\validators\ValidationAsset',
         'yii\bootstrap\BootstrapPluginAsset',
+        'ayrozjlc\blockui\BlockUiAsset',
         'cza\base\vendor\assets\MsgGrowl\MsgGrowlAsset',
     ];
 

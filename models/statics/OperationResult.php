@@ -2,7 +2,6 @@
 
 namespace cza\base\models\statics;
 
-use Yii;
 
 /**
  * Description of OperationResult

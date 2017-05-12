@@ -62,13 +62,17 @@ class Helper extends \yii\di\ServiceLocator {
             'naming' => [
                 'class' => '\cza\base\components\utils\Naming',
             ],
-//            'folderOrganizer' => [
-//                'class' => '\cza\base\components\utils\FolderOrganizer',
-//                'uploadFolderName' => isset(Yii::$app->params['config']['upload']['path']) ? Yii::$app->params['config']['upload']['path'] : 'uploads',
-//            ],
-//            'simpleHTMLDOM' => [
-//                'class' => '\cza\base\vendor\utils\SimpleHTMLDOM\SimpleHTMLDOM',
-//            ],
+            'password' => [
+                'class' => '\cza\base\components\utils\Password',
+            ],
+            'folderOrganizer' => [
+                'class' => '\cza\base\components\utils\FolderOrganizer',
+                'uploadTempPath' => isset(Yii::$app->params['config']['upload']['tempPath']) ? Yii::$app->params['config']['upload']['tempPath'] : '@app/web/uploads/temp',
+                'uploadStorePath' => isset(Yii::$app->params['config']['upload']['storePath']) ? Yii::$app->params['config']['upload']['storePath'] : '@app/web/uploads/store',
+            ],
+            'simpleHTMLDOM' => [
+                'class' => '\cza\base\vendor\utils\SimpleHTMLDOM\SimpleHTMLDOM',
+            ],
         ];
     }
 
@@ -90,16 +94,6 @@ class Helper extends \yii\di\ServiceLocator {
     }
 
     /**
-     * assets for backend 
-     */
-    public function registerBackendAssets($view = null) {
-        if (is_null($view)) {
-            $view = \Yii::$app->getView();
-        }
-        \cza\base\assets\AppAsset::register($view);
-    }
-
-    /**
      * set current application asset url
      */
     public function setBackendAssetUrl($url) {
@@ -109,19 +103,21 @@ class Helper extends \yii\di\ServiceLocator {
     }
 
     /**
-     * get current application asset url
-     * @return string
+     * return regular language name, eg. 'zh_cn'
+     * @param type $lang
+     * @return type
      */
-//    public function getBackendAssetUrl($asset = '') {
-//        if (isset($this->_data['env']['BACKEND_ASSETS_URL'])) {
-//            return $this->_data['env']['BACKEND_ASSETS_URL'];
-//        }
-//
-//        $bundle = Yii::$app->getAssetManager()->getBundle('backend\themes\\' . CCA2_BACKEND_THEME . '\components\AppAsset');
-//        $key = "BACKEND_ASSETS_URL";
-//        $value = Yii::$app->getAssetManager()->getAssetUrl($bundle, $asset);
-//        return $this->setEnvData($key, $value);
-//    }
+    public function getRegularLangName($lang = NULL) {
+        if (isset($this->_data['env']['APP_LANG_NAME'])) {
+            return $this->_data['env']['APP_LANG_NAME'];
+        }
+
+        if (is_null($lang))
+            $lang = Yii::$app->language;
+        $this->_data['env']['ENABLED_LANGS'] = str_replace("-", "_", strtolower($lang));
+
+        return $this->_data['env']['ENABLED_LANGS'];
+    }
 
     /**
      * 

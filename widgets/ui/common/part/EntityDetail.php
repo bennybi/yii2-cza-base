@@ -1,0 +1,90 @@
+<?php
+
+namespace cza\base\widgets\ui\common\part;
+
+use Yii;
+use cza\base\widgets\Widget;
+
+/**
+ * Entity Detail Widget
+ * 
+ * @author Ben Bi <ben@cciza.com>
+ * @link http://www.cciza.com/
+ * @copyright 2014-2016 CCIZA Software LLC
+ * @license
+ */
+abstract class EntityDetail extends Widget {
+
+    protected $_tabs = [];
+    public $model;
+    public $tabTitle = '';
+
+    public function getTabsId() {
+        if ($this->model) {
+            return $this->model->formName() . '-detail-tabs';
+        }
+        return $this->className() . '-tabs';
+    }
+
+    public function getAvailableLangs() {
+        if (isset(Yii::$app->params['config']['languages'])) {
+            return Yii::$app->params['config']['languages'];
+        }
+        return [];
+    }
+
+    public function getTabItems() {
+        $items = [];
+
+        $items[] = $this->getTranslationTabItems();
+        
+        $items[] = [
+            'label' => Yii::t('app.c2', 'Base Information'),
+            'content' => $this->controller->renderPartial('_form', [ 'model' => $this->model,]),
+            'active' => true,
+        ];
+        
+        $items[] = [
+            'label' => '<i class="fa fa-th"></i> ' . $this->tabTitle,
+            'onlyLabel' => true,
+            'headerOptions' => [
+                'class' => 'pull-left header',
+            ],
+        ];
+        
+        return $items;
+    }
+
+    /**
+     * 
+     * @param type $enable - enable this tab
+     * @param type $options - tab options
+     * @param type $format
+     * @return type
+     */
+    public function getTranslationTabItems($options = []) {
+        if (!isset($this->_tabs['TRANSLATION_TAB'])) {
+            $availLangs = $this->getAvailableLangs();
+            $items = [];
+
+            foreach ($availLangs as $availLang) {
+                $langModel = $this->model->getTranslationModel($availLang);
+                $items[] = [
+                    'label' => \Yii::t('cza/languages', $availLang),
+                    'content' => $this->model->isNewRecord ? "" : $this->controller->renderPartial('_translation_form', ['model' => $langModel, 'entityModel' => $this->model]),
+                    'options' => ['id' => $availLang],
+                ];
+            }
+
+            $this->_tabs['TRANSLATION_TAB'] = [
+                'label' => Yii::t('app.c2', 'Multiple Language'),
+                'items' => $items,
+                'options' => $options,
+                'enable' => !$this->model->isNewRecord,
+            ];
+        }
+
+        return $this->_tabs['TRANSLATION_TAB'];
+    }
+
+}

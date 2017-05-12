@@ -36,7 +36,7 @@ class ResponseDatum {
      * @param array $metaData - meta data
      * @return ['_data'=>[], '_meta'=[]]
      */
-    public static function getSuccessDatum($data = null, $meta = array(), $html = false) {
+    public static function getSuccessDatum($meta = [], $data = null, $html = false) {
         $defaultMeta = array(
             'result' => OperationResult::SUCCESS,
             'type' => OperationResult::getType(OperationResult::SUCCESS),
@@ -62,7 +62,7 @@ class ResponseDatum {
      * @param array $data - return data fields
      * @param array $metaData - meta data
      */
-    public static function getErrorDatum($data, $meta = array(), $html = false) {
+    public static function getErrorDatum($meta = [], $data = null, $html = false) {
         $defaultMeta = array(
             'result' => OperationResult::ERROR,
             'type' => OperationResult::getType(OperationResult::ERROR),
