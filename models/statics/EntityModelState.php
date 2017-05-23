@@ -6,14 +6,14 @@ use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
- * Entity Model Status
+ * Entity Model State
  *
  * @author ben
  */
-class EntityModelStatus {
+class EntityModelState {
 
-    const STATUS_ACTIVE = 1;
-    const STATUS_INACTIVE = 2;
+    const STATUS_DISABLE = 0;
+    const STATUS_ENABLE = 1;
 
     protected static $_data;
 
@@ -26,8 +26,8 @@ class EntityModelStatus {
     public static function getData($id = '', $attr = '') {
         if (is_null(static::$_data)) {
             static::$_data = [
-                static::STATUS_ACTIVE => ['id' => static::STATUS_ACTIVE, 'label' => Yii::t('app.c2', 'Active')],
-                static::STATUS_INACTIVE => ['id' => static::STATUS_INACTIVE, 'label' => Yii::t('app.c2', 'Inactive')],
+                static::STATUS_ENABLE => ['id' => static::STATUS_ENABLE, 'label' => Yii::t('app.c2', 'Enable')],
+                static::STATUS_DISABLE => ['id' => static::STATUS_DISABLE, 'label' => Yii::t('app.c2', 'Disable')],
             ];
         }
         if (!empty($id) && !empty($attr)) {

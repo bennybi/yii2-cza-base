@@ -30,10 +30,12 @@ use cza\base\models\statics\EntityModelStatus;
  */
 class ActiveRecord extends \yii\db\ActiveRecord {
 
+    use ModelTrait;
+
     const SCENARIO_UPLOAD = 'upload';
 
     // for caching variables, e.g paths, logic names
-    protected $_data = [];
+//    protected $_data = [];
 
     public function getStatusLabel() {
         return EntityModelStatus::getLabel($this->status);
@@ -48,62 +50,32 @@ class ActiveRecord extends \yii\db\ActiveRecord {
                     ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
                 ],
                 'value' => function () {
-                    return date('Y-m-d H:i:s');
-                },
+            return date('Y-m-d H:i:s');
+        },
             ],
         ];
     }
-
-    /**
-     * convert camel form/class name to 'id' name
-     * eg. CmsPage -> cms-page
-     * @return string
-     */
-    public function getCamel2IdFormName() {
-        if (!isset($this->_data['camelFormName'])) {
-            $this->_data['camelFormName'] = Inflector::camel2id($this->formName());
-        }
-        return $this->_data['camelFormName'];
-    }
-
-    public function getBaseFormName($isId = false) {
-        $name = $this->getCamel2IdFormName() . '-base-form';
-        return $isId ? "#" . $name : $name;
-    }
-
-    public function getPjaxName($isId = false) {
-        $name = $this->getCamel2IdFormName() . '-pjax';
-        return $isId ? "#" . $name : $name;
-    }
-
-    public function getPrefixName($name, $isId = false) {
-        $pName = $this->getCamel2IdFormName() . "-{$name}";
-        return $isId ? "#" . $pName : $pName;
-    }
-
-    /**
-     * for message interactive
-     * @param type $isId
-     * @return type
-     */
-    public function getMessageName($isId = false) {
-        $name = $this->getCamel2IdFormName() . '-message';
-        return $isId ? "#" . $name : $name;
-    }
-
-    public function getDetailPjaxName($isId = false) {
-        $name = $this->getCamel2IdFormName() . '-detail-pjax';
-        return $isId ? "#" . $name : $name;
-    }
-
+    
     /**
      * @param string $keyField Keyword
      * @param string $valFiled Value
      * @return key-value array
      */
     public static function getHashMap($keyField, $valField, $condition = '') {
+        $class = static::className(); Yii::info($class);
+        return ArrayHelper::map($class::find()->select([$keyField, $valField])->andWhere($condition)->asArray()->all(), $keyField, $valField);
+    }
+    
+    /**
+     * return a format data array for select2 ajax response
+     * @param type $keyField
+     * @param type $valField
+     * @param type $condition
+     * @return array
+     */
+    public static function getOptionsList($keyField, $valField, $condition = '') {
         $class = static::className();
-        return ArrayHelper::map($class::find()->select([$keyField, $valField])->where($condition)->asArray()->all(), $keyField, $valField);
+        return $class::find()->select([$keyField, $valField])->andWhere($condition)->asArray()->all();
     }
 
     /**
@@ -135,6 +107,10 @@ class ActiveRecord extends \yii\db\ActiveRecord {
             }
         }
         return true;
+    }
+
+    public function setupDefaultValues() {
+        $this->loadDefaultValues();
     }
 
 }

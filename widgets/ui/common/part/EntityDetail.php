@@ -18,6 +18,9 @@ abstract class EntityDetail extends Widget {
     protected $_tabs = [];
     public $model;
     public $tabTitle = '';
+    public $withBaseInfoTab = true;  // need entity model support
+    public $withProfileTab = false;  // need (x)Profile model support
+    public $withTranslationTabs = true; // need (x)Lang model support
 
     public function getTabsId() {
         if ($this->model) {
@@ -36,14 +39,22 @@ abstract class EntityDetail extends Widget {
     public function getTabItems() {
         $items = [];
 
-        $items[] = $this->getTranslationTabItems();
-        
-        $items[] = [
-            'label' => Yii::t('app.c2', 'Base Information'),
-            'content' => $this->controller->renderPartial('_form', [ 'model' => $this->model,]),
-            'active' => true,
-        ];
-        
+        if ($this->withTranslationTabs) {
+            $items[] = $this->getTranslationTabItems();
+        }
+
+        if ($this->withProfileTab) {
+            $items[] = $this->getProfileTab();
+        }
+
+        if ($this->withBaseInfoTab) {
+            $items[] = [
+                'label' => Yii::t('app.c2', 'Base Information'),
+                'content' => $this->controller->renderPartial('_form', [ 'model' => $this->model,]),
+                'active' => true,
+            ];
+        }
+
         $items[] = [
             'label' => '<i class="fa fa-th"></i> ' . $this->tabTitle,
             'onlyLabel' => true,
@@ -51,8 +62,28 @@ abstract class EntityDetail extends Widget {
                 'class' => 'pull-left header',
             ],
         ];
-        
+
         return $items;
+    }
+
+    public function getProfileTab() {
+        if (!isset($this->_tabs['PROFILE_TAB'])) {
+            if (!$this->model->isNewRecord) {
+                $this->_tabs['PROFILE_TAB'] = [
+                    'label' => Yii::t('app.c2', 'Profile'),
+                    'content' => $this->controller->renderPartial('_profile_form', ['model' => $this->model->profile, 'entityModel' => $this->model]),
+                    'enable' => true,
+                ];
+            } else {
+                $this->_tabs['PROFILE_TAB'] = [
+                    'label' => Yii::t('app.c2', 'Profile'),
+                    'content' => "",
+                    'enable' => false,
+                ];
+            }
+        }
+
+        return $this->_tabs['PROFILE_TAB'];
     }
 
     /**

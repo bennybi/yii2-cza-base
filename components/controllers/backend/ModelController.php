@@ -41,6 +41,11 @@ class ModelController extends Controller {
                         'modelClass' => $this->modelClass,
                         'checkAccess' => [$this, 'checkAccess'],
                     ],
+                    'profile-save' => [
+                        'class' => '\cza\base\components\actions\backend\ProfileSaveAction',
+                        'modelClass' => $this->modelClass,
+                        'checkAccess' => [$this, 'checkAccess'],
+                    ],
         ]);
     }
 
