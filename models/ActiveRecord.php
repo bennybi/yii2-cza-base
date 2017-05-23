@@ -55,17 +55,17 @@ class ActiveRecord extends \yii\db\ActiveRecord {
             ],
         ];
     }
-    
+
     /**
      * @param string $keyField Keyword
      * @param string $valFiled Value
      * @return key-value array
      */
-    public static function getHashMap($keyField, $valField, $condition = '') {
-        $class = static::className(); Yii::info($class);
+    public static function getHashMap($keyField, $valField, $condition = ['status' => EntityModelStatus::STATUS_ACTIVE]) {
+        $class = static::className();
         return ArrayHelper::map($class::find()->select([$keyField, $valField])->andWhere($condition)->asArray()->all(), $keyField, $valField);
     }
-    
+
     /**
      * return a format data array for select2 ajax response
      * @param type $keyField
