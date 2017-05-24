@@ -18,6 +18,8 @@ use Yii;
  */
 class Password extends \yii\base\Component {
 
+    public $cost = 10;
+
     /**
      * Wrapper for yii security helper method.
      *
@@ -26,7 +28,7 @@ class Password extends \yii\base\Component {
      * @return string
      */
     public function hash($password) {
-        return Yii::$app->security->generatePasswordHash($password, Yii::$app->getModule('user')->cost);
+        return Yii::$app->security->generatePasswordHash($password, $this->cost);
     }
 
     /**
