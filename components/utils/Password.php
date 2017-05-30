@@ -14,7 +14,7 @@ use Yii;
 /**
  * Password helper.
  *
- * @author Dmitry Erofeev <dmeroff@gmail.com>
+ * @author  Ben Bi <bennybi@qq.com>
  */
 class Password extends \yii\base\Component {
 

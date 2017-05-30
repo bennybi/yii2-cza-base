@@ -70,6 +70,9 @@ class Helper extends \yii\di\ServiceLocator {
                 'uploadTempPath' => isset(Yii::$app->params['config']['upload']['tempPath']) ? Yii::$app->params['config']['upload']['tempPath'] : '@app/web/uploads/temp',
                 'uploadStorePath' => isset(Yii::$app->params['config']['upload']['storePath']) ? Yii::$app->params['config']['upload']['storePath'] : '@app/web/uploads/store',
             ],
+            'wechatHelper' => [
+                'class' => '\cza\base\components\utils\WechatHelper',
+            ],
             'simpleHTMLDOM' => [
                 'class' => '\cza\base\vendor\utils\SimpleHTMLDOM\SimpleHTMLDOM',
             ],

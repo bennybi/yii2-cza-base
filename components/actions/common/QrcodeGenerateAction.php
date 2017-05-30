@@ -25,6 +25,7 @@ class QrcodeGenerateAction extends \yii\rest\Action {
 
     public $idAttribute = 'id';
     public $contentAttribute = 'content';
+    public $ownerRelationship = 'owner';
     public $view = 'edit';
     public $qrOptions = [
         'level' => 0,
@@ -47,14 +48,14 @@ class QrcodeGenerateAction extends \yii\rest\Action {
         $modelClass = $this->modelClass;
         if (isset($params[$this->idAttribute])) {
             $this->_model = $modelClass::findOne($params[$this->idAttribute]);
-            if (!is_null($this->_model) && !empty($params[$this->contentAttribute])) {
+            if (!is_null($this->_model)) {
                 $this->_model->generateQrCode($params[$this->contentAttribute]);
             }
         } else {
             throw new HttpException(404, Yii::t('cza', 'Associated entity not found!'));
         }
 
-        return (Yii::$app->request->isAjax) ? $this->controller->renderAjax($this->view, [ 'model' => $this->_model->user,]) : $this->controller->render($this->view, [ 'model' => $this->_model->user,]);
+        return (Yii::$app->request->isAjax) ? $this->controller->renderAjax($this->view, [ 'model' => $this->_model->{$this->ownerRelationship},]) : $this->controller->render($this->view, [ 'model' => $this->_model->{$this->ownerRelationship},]);
     }
 
 }

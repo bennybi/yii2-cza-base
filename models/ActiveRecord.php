@@ -62,7 +62,7 @@ class ActiveRecord extends \yii\db\ActiveRecord {
      * @return key-value array
      */
     public static function getHashMap($keyField, $valField, $condition = '') {
-        $class = static::className(); Yii::info($class);
+        $class = static::className();
         return ArrayHelper::map($class::find()->select([$keyField, $valField])->andWhere($condition)->asArray()->all(), $keyField, $valField);
     }
     
