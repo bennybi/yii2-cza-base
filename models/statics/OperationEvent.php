@@ -46,4 +46,5 @@ class OperationEvent {
     const PRINT_CLICK = "printClickEvent.inf";
     const COMMENTS_VIEW = "commentsViewEvent.inf";
     const CUSTOMER_LOGIN = "customerLoginEvent.inf";
+    const COORDINATE_CHANGE = "coordinateChangeEvent.inf";
 }
