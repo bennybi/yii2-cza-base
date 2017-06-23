@@ -70,6 +70,8 @@ class AttachmentBehavior extends Behavior {
             $files = UploadedFile::getInstancesByName($name);
             $userTempDir = $this->getModule()->getUserDirPath();
             if (!empty($files)) {
+                $this->deleteByRefAttribute($refAttribute);
+
                 foreach ($files as $file) {
                     if (!$file->saveAs($userTempDir . $file->name)) {
                         throw new \Exception(\Yii::t('yii', 'File upload failed.'));
@@ -77,14 +79,31 @@ class AttachmentBehavior extends Behavior {
                 }
             }
 
-            foreach (FileHelper::findFiles($userTempDir) as $file) {
-                if (!$this->attachFile($file, $refAttribute)) {
-                    throw new \Exception(\Yii::t('yii', 'File upload failed.'));
+            if (\file_exists($userTempDir)) {
+                foreach (FileHelper::findFiles($userTempDir) as $file) {
+                    if (!$this->attachFile($file, $refAttribute)) {
+                        throw new \Exception(\Yii::t('yii', 'File upload failed.'));
+                    }
                 }
             }
         }
 
-        \rmdir($userTempDir);
+        if (\file_exists($userTempDir)) {
+            \rmdir($userTempDir);
+        }
+    }
+
+    public function deleteByRefAttribute($refAttribute) {
+        foreach ($this->getFiles($refAttribute) as $file) {
+            $file->delete();
+        }
+    }
+
+    public function deleteUploads($event) {
+        $refAttributes = array_keys($this->_refAttribues);
+        foreach ($refAttributes as $refAttribute) {
+            $this->deleteByRefAttribute($refAttribute);
+        }
     }
 
     /**
@@ -114,10 +133,16 @@ class AttachmentBehavior extends Behavior {
             throw new Exception("Cannot copy file! {$filePath}  to {$newFilePath}");
         }
         $file = new $this->attributesDefinition[$attribute]['class'];
+        if (isset($this->attributesDefinition[$attribute]['enableVersions'])) {
+            $file->setEnableVersions($this->attributesDefinition[$attribute]['enableVersions']);
+        }
+
+        $file->loadDefaultValues();
         $file->setAttributes([
             'name' => pathinfo($filePath, PATHINFO_FILENAME),
             'entity_id' => $owner->id,
-            'entity_class' => $owner->formName(), // refer to Model::formName()
+            'entity_class' => $owner->className(),
+            'entity_attribute' => $attribute,
             'hash' => $fileHash,
             'size' => filesize($filePath),
             'extension' => $fileType,
@@ -133,44 +158,50 @@ class AttachmentBehavior extends Behavior {
         }
     }
 
-    public function deleteUploads($event) {
-        $refAttributes = array_keys($this->_refAttribues);
-        foreach ($refAttributes as $refAttribute) {
-            foreach ($this->getFiles($refAttribute) as $file) {
-                $file->delete();
-            }
-        }
-    }
-
     /**
      * @return File[]
      * @throws \Exception
      */
-    public function getFiles($attribute) {
+    public function getFiles($attribute, $order = ['id' => SORT_ASC]) {
         $modelClass = $this->attributesDefinition[$attribute]['class'];
         $fileQuery = $modelClass::find()
                 ->andWhere([
             'entity_id' => $this->owner->id,
-            'entity_class' => $this->owner->formName(),
+            'entity_class' => $this->owner->className(),
+            'entity_attribute' => $attribute,
         ]);
-        $fileQuery->orderBy(['id' => SORT_ASC]);
+        $fileQuery->orderBy($order);
 
         return $fileQuery->all();
+    }
+
+    public function getOneAttachment($attribute, $order = ['id' => SORT_ASC]) {
+        $modelClass = $this->attributesDefinition[$attribute]['class'];
+        $fileQuery = $modelClass::find()
+                ->andWhere([
+            'entity_id' => $this->owner->id,
+            'entity_class' => $this->owner->className(),
+            'entity_attribute' => $attribute,
+        ]);
+        $fileQuery->orderBy($order);
+        return $fileQuery->one();
     }
 
     public function getInitialPreview($attribute) {
         $initialPreview = [];
 
         $userTempDir = $this->getModule()->getUserDirPath();
-        foreach (FileHelper::findFiles($userTempDir) as $file) {
-            if (substr(FileHelper::getMimeType($file), 0, 5) === 'image') {
-                $initialPreview[] = Html::img(['/attachments/file/download-temp', 'filename' => basename($file)], ['class' => 'file-preview-image']);
-            } else {
-                $initialPreview[] = Html::beginTag('div', ['class' => 'file-preview-other']) .
-                        Html::beginTag('h2') .
-                        Html::tag('i', '', ['class' => 'glyphicon glyphicon-file']) .
-                        Html::endTag('h2') .
-                        Html::endTag('div');
+        if (file_exists($userTempDir)) {
+            foreach (FileHelper::findFiles($userTempDir) as $file) {
+                if (substr(FileHelper::getMimeType($file), 0, 5) === 'image') {
+                    $initialPreview[] = Html::img(['/attachments/file/download-temp', 'filename' => basename($file)], ['class' => 'file-preview-image']);
+                } else {
+                    $initialPreview[] = Html::beginTag('div', ['class' => 'file-preview-other']) .
+                            Html::beginTag('h2') .
+                            Html::tag('i', '', ['class' => 'glyphicon glyphicon-file']) .
+                            Html::endTag('h2') .
+                            Html::endTag('div');
+                }
             }
         }
 
@@ -194,13 +225,15 @@ class AttachmentBehavior extends Behavior {
         $initialPreviewConfig = [];
 
         $userTempDir = $this->getModule()->getUserDirPath();
-        foreach (FileHelper::findFiles($userTempDir) as $file) {
-            $filename = basename($file);
-            $initialPreviewConfig[] = [
-                'caption' => $filename,
-                'size' => \filesize($file),
-                'url' => Url::to(['/attachments/file/delete-temp', 'filename' => $filename]),
-            ];
+        if (file_exists($userTempDir)) {
+            foreach (FileHelper::findFiles($userTempDir) as $file) {
+                $filename = basename($file);
+                $initialPreviewConfig[] = [
+                    'caption' => $filename,
+                    'size' => \filesize($file),
+                    'url' => Url::to(['/attachments/file/delete-temp', 'filename' => $filename]),
+                ];
+            }
         }
 
         foreach ($this->getFiles($attribute) as $index => $file) {

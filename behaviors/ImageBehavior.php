@@ -25,14 +25,17 @@ use cza\base\models\statics\ImageSize;
 
 class ImageBehavior extends Behavior {
 
+    protected $_enableVersions = true;
     public $versions = [];
 
     public function init() {
-        $this->versions = array_replace_recursive([
-            ImageSize::ICON => [ 'resize' => ImageSize::getSize(ImageSize::ICON)],
-            ImageSize::THUMBNAIL => [ 'resize' => ImageSize::getSize(ImageSize::THUMBNAIL)],
-            ImageSize::MEDIUM => [ 'resize' => ImageSize::getSize(ImageSize::MEDIUM)],
-                ], $this->versions);
+        if (empty($this->versions)) {
+            $this->versions = [
+                ImageSize::ICON => ['resize' => ImageSize::getSize(ImageSize::ICON)],
+                ImageSize::THUMBNAIL => ['resize' => ImageSize::getSize(ImageSize::THUMBNAIL)],
+                ImageSize::MEDIUM => ['resize' => ImageSize::getSize(ImageSize::MEDIUM)],
+            ];
+        }
     }
 
     public function events() {
@@ -48,6 +51,10 @@ class ImageBehavior extends Behavior {
         $oriImageName = basename($oriImagePath);
         $oriImageDir = $owner->getStoreDir();
 
+
+        if (!$this->_enableVersions) {
+            return true;
+        }
 
         if (\file_exists($oriImagePath)) {
             $image = Image::getImagine();
@@ -71,6 +78,14 @@ class ImageBehavior extends Behavior {
             FileHelper::createDirectory($path);
         }
         return $path;
+    }
+
+    public function setEnableVersions($val) {
+        $this->_enableVersions = $val;
+    }
+
+    public function getEnableVersions() {
+        return $this->_enableVersions;
     }
 
 }

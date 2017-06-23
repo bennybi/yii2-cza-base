@@ -49,7 +49,7 @@ class QrcodeGenerateAction extends \yii\rest\Action {
         if (isset($params[$this->idAttribute])) {
             $this->_model = $modelClass::findOne($params[$this->idAttribute]);
             if (!is_null($this->_model)) {
-                $this->_model->generateQrCode($params[$this->contentAttribute]);
+                $this->_model->generateQrCode($params);
             }
         } else {
             throw new HttpException(404, Yii::t('cza', 'Associated entity not found!'));

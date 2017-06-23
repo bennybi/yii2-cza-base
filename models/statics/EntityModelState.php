@@ -12,8 +12,8 @@ use yii\helpers\ArrayHelper;
  */
 class EntityModelState {
 
-    const STATUS_DISABLE = 0;
     const STATUS_ENABLE = 1;
+    const STATUS_DISABLE = 2;
 
     protected static $_data;
 
