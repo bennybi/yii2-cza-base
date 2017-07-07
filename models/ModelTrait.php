@@ -7,6 +7,9 @@ use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 
+/**
+ * enhance model's functionality
+ */
 trait ModelTrait {
 
     protected $_data = [];
@@ -51,6 +54,12 @@ trait ModelTrait {
     public function getDetailPjaxName($isId = false) {
         $name = $this->getCamel2IdFormName() . '-detail-pjax';
         return $isId ? "#" . $name : $name;
+    }
+
+    public function getFormAttributes() {
+        return [
+            $this->formName() => $this->attributes
+        ];
     }
 
 }
