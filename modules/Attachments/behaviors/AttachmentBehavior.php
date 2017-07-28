@@ -113,7 +113,7 @@ class AttachmentBehavior extends Behavior {
      * @throws Exception
      * @throws \yii\base\InvalidConfigException
      */
-    public function attachFile($filePath, $attribute, $values=[]) {
+    public function attachFile($filePath, $attribute, $extras = []) {
         $owner = $this->owner;
         if (empty($owner->id)) {
             throw new Exception('Parent model must have ID when you attaching a file');
@@ -138,20 +138,18 @@ class AttachmentBehavior extends Behavior {
         }
 
         $file->loadDefaultValues();
-        
-        $attributeValues = ArrayHelper::merge($values, [
+        $file->setAttributes([
             'name' => pathinfo($filePath, PATHINFO_FILENAME),
             'entity_id' => $owner->id,
             'entity_class' => $owner->className(),
             'entity_attribute' => $attribute,
             'hash' => $fileHash,
             'size' => filesize($filePath),
+            'content' => isset($extras['content']) ? $extras['content'] : "",
             'extension' => $fileType,
             'mime_type' => FileHelper::getMimeType($filePath),
             'logic_path' => $this->getModule()->getFileLogicPath($fileHash, $owner),
         ]);
-//        Yii::info($attributeValues);
-        $file->setAttributes($attributeValues);
 
         if ($file->save()) {
             @\unlink($filePath);
@@ -186,7 +184,6 @@ class AttachmentBehavior extends Behavior {
             'entity_class' => $this->owner->className(),
             'entity_attribute' => $attribute,
         ]);
-        
         $fileQuery->orderBy($order);
         return $fileQuery->one();
     }
