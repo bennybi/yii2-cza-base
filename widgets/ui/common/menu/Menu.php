@@ -45,7 +45,7 @@ class Menu extends \yii\widgets\Menu {
                 '{targetPlaceHolder}' => isset($item['target']) ? "target='{$item['target']}'" : '',
                 '{icon}' => null,
             ];
-            
+
             return strtr($template, $replace);
         } else {
             $template = ArrayHelper::getValue($item, 'template', $labelTemplate);
@@ -156,15 +156,14 @@ class Menu extends \yii\widgets\Menu {
             }
             $arrayRoute = explode('/', ltrim($route, '/'));
             $arrayThisRoute = explode('/', $this->route);
-            if ($arrayRoute[0] !== $arrayThisRoute[0]) {
-                return false;
+
+            $count = count($arrayRoute);
+            for ($i = 0; $i < $count; $i++) {
+                if (isset($arrayThisRoute[$i]) && $arrayRoute[$i] !== $arrayThisRoute[$i]) {
+                    return false;
+                }
             }
-            if (isset($arrayRoute[1]) && $arrayRoute[1] !== $arrayThisRoute[1]) {
-                return false;
-            }
-            if (isset($arrayRoute[2]) && $arrayRoute[2] !== $arrayThisRoute[2]) {
-                return false;
-            }
+
             unset($item['url']['#']);
             if (count($item['url']) > 1) {
                 foreach (array_splice($item['url'], 1) as $name => $value) {
