@@ -21,6 +21,7 @@ class OptionsListAction extends \yii\rest\Action {
     public $keyAttribute = 'id';
     public $valueAttribute = 'label';
     public $queryAttribute = 'label';
+    public $listMethod = 'getOptionsList';
 
     /**
      * @var callable a PHP callable that will be called to prepare a data provider that
@@ -58,10 +59,11 @@ class OptionsListAction extends \yii\rest\Action {
         }
         $data = [];
         $modelClass = $this->modelClass;
+        $listMethod = $this->listMethod;
         if (!is_null($params['q'])) {
-            $data['results'] = $modelClass::getOptionsList($this->keyAttribute, $this->valueAttribute, "{$this->queryAttribute} like '%{$params['q']}%'");
+            $data['results'] = $modelClass::$listMethod($this->keyAttribute, $this->valueAttribute, "{$this->queryAttribute} like '%{$params['q']}%'");
         } else {
-            $data['results'] = $modelClass::getOptionsList($this->keyAttribute, $this->valueAttribute);
+            $data['results'] = $modelClass::$listMethod($this->keyAttribute, $this->valueAttribute);
         }
         return $data;
     }

@@ -50,12 +50,12 @@ class ActiveRecord extends \yii\db\ActiveRecord {
                     ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
                 ],
                 'value' => function () {
-            return date('Y-m-d H:i:s');
-        },
+                    return date('Y-m-d H:i:s');
+                },
             ],
         ];
     }
-    
+
     /**
      * @param string $keyField Keyword
      * @param string $valFiled Value
@@ -65,7 +65,7 @@ class ActiveRecord extends \yii\db\ActiveRecord {
         $class = static::className();
         return ArrayHelper::map($class::find()->select([$keyField, $valField])->andWhere($condition)->asArray()->all(), $keyField, $valField);
     }
-    
+
     /**
      * return a format data array for select2 ajax response
      * @param type $keyField
@@ -73,9 +73,29 @@ class ActiveRecord extends \yii\db\ActiveRecord {
      * @param type $condition
      * @return array
      */
-    public static function getOptionsList($keyField, $valField, $condition = '') {
+    public static function getOptionsList($keyField, $valField, $condition = '', $params = ['limit' => 50]) {
         $class = static::className();
-        return $class::find()->select([$keyField, $valField])->andWhere($condition)->asArray()->all();
+        return $class::find()->select([$keyField, $valField])->andWhere($condition)->limit($params['limit'])->asArray()->all();
+    }
+
+    /**
+     * return a format data array for select2 ajax response
+     * @param type $keyField
+     * @param type $valField
+     * @param type $condition
+     * @return array
+     */
+    public static function getOptionsListCallable($keyField, $valField, $condition = '', $params = ['limit' => 10]) {
+        $class = static::className();
+        $items = [];
+        $models = $class::find()->andWhere($condition)->limit($params['limit'])->all();
+        foreach ($models as $model) {
+            $items[] = [
+                $keyField => $model->$keyField,
+                $valField => $model->$valField,
+            ];
+        }
+        return $items;
     }
 
     /**

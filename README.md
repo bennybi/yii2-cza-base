@@ -1,7 +1,7 @@
 # cza-base [![Total Downloads](https://img.shields.io/packagist/dt/dektrium/yii2-rbac.svg?style=flat-square)](https://packagist.org/packages/dektrium/yii2-rbac) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
 
-cza-base provides a CCA2 program utils:
+cza-base provides a CCA program utils:
 
 > **NOTE:** Anything may change at any time.
 
