@@ -71,3 +71,5 @@
 }
 /* tab content */
 .tab-content{padding-left: 0px;padding-right: 0px;}
+.treeview-detail.kv-detail-container{padding:0px;}
+.treeview-detail.kv-detail-container .kv-detail-heading{margin:0 0px 15px 0px;}

@@ -103,8 +103,7 @@ class DefaultController extends Controller {
      */
     public function actionRename() {
         $model = $this->getModel();
-        $model->name = Yii::$app->request->post('name');
-        $model->save(false);
+        $model->updateAttributes(['name' => Yii::$app->request->post('name')]);
     }
 
     /**
@@ -167,7 +166,7 @@ class DefaultController extends Controller {
         /* @var $modelClass \yii\db\ActiveRecord */
         $modelClass = $baseModel->className();
 
-        $pk = Yii::$app->request->post($paramName ? : 'modelPk');
+        $pk = Yii::$app->request->post($paramName ?: 'modelPk');
         if (!$pk && !$createIfNotFound) {
             throw new BadRequestHttpException('Model primary key must be specified in order to find model.');
         }
