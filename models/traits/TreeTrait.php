@@ -79,7 +79,7 @@ trait TreeTrait {
      * @inheritdoc
      */
     public function behaviors() {
-        $module = TreeView::module();
+        $module = Yii::$app->controller->module;
         $settings = ['class' => NestedSetsBehavior::className()] + $module->treeStructure;
         return empty($module->treeBehaviorName) ? array_merge_recursive(parent::behaviors(), [$settings]) : array_merge_recursive(parent::behaviors(), [$module->treeBehaviorName => $settings]);
     }
@@ -101,7 +101,7 @@ trait TreeTrait {
         /**
          * @var Tree $this
          */
-        $module = TreeView::module();
+        $module = Yii::$app->controller->module;
         $nameAttribute = $iconAttribute = $iconTypeAttribute = null;
         extract($module->dataStructure);
         $attribs = array_merge([$nameAttribute, $iconAttribute, $iconTypeAttribute], static::$boolAttribs);
@@ -137,7 +137,7 @@ trait TreeTrait {
         /**
          * @var Tree $this
          */
-        $module = TreeView::module();
+        $module = Yii::$app->controller->module;
         $iconTypeAttribute = null;
         extract($module->dataStructure);
         $this->setDefault($iconTypeAttribute, TreeView::ICON_CSS);
@@ -243,7 +243,7 @@ trait TreeTrait {
          * @var Tree $this
          */
         $this->nodeActivationErrors = [];
-        $module = TreeView::module();
+        $module = Yii::$app->controller->module;
         extract($module->treeStructure);
         if ($this->isRemovableAll()) {
             $children = $this->children()->all();
@@ -294,7 +294,7 @@ trait TreeTrait {
          */
         if ($softDelete) {
             $this->nodeRemovalErrors = [];
-            $module = TreeView::module();
+            $module = Yii::$app->controller->module;
             extract($module->treeStructure);
             if ($this->isRemovableAll()) {
                 $children = $this->children()->all();
@@ -335,7 +335,7 @@ trait TreeTrait {
      * @inheritdoc
      */
     public function attributeLabels() {
-        $module = TreeView::module();
+        $module = Yii::$app->controller->module;
         $keyAttribute = $nameAttribute = $leftAttribute = $rightAttribute = $depthAttribute = null;
         $treeAttribute = $iconAttribute = $iconTypeAttribute = null;
         extract($module->treeStructure + $module->dataStructure);
@@ -384,7 +384,7 @@ trait TreeTrait {
             return $currCss ? Html::tag('span', $new, ['class' => $currCss]) : $new;
         }
         $depth = empty($depth) ? null : intval($depth);
-        $module = TreeView::module();
+        $module = Yii::$app->controller->module;
         $nameAttribute = ArrayHelper::getValue($module->dataStructure, 'nameAttribute', 'name');
         $crumbNodes = $depth === null ? $this->parents()->all() : $this->parents($depth - 1)->all();
         $crumbNodes[] = $this;
