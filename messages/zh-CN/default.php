@@ -17,5 +17,7 @@ return [
     'Warning' => '警告',
     'File {s1} not existed!' => '文件{s1}不存在!',
     '{attribute} must be alphanumeric.' => '{attribute}必须全是字母或数字.',
+    'Export Page Data' => '导出页面数据',
+    'Export All Data' => '导出所有数据',
     '' => '',
 ];

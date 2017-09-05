@@ -20,6 +20,7 @@ use yii\helpers\Url;
 use yii\web\UploadedFile;
 use yii\helpers\ArrayHelper;
 use yii\base\Exception;
+use cza\base\models\statics\ImageSize;
 
 class AttachmentBehavior extends Behavior {
 
@@ -188,14 +189,14 @@ class AttachmentBehavior extends Behavior {
         return $fileQuery->one();
     }
 
-    public function getInitialPreview($attribute) {
+    public function getInitialPreview($attribute, $imageFormat = ImageSize::THUMBNAIL) {
         $initialPreview = [];
 
         $userTempDir = $this->getModule()->getUserDirPath();
         if (file_exists($userTempDir)) {
             foreach (FileHelper::findFiles($userTempDir) as $file) {
                 if (substr(FileHelper::getMimeType($file), 0, 5) === 'image') {
-                    $initialPreview[] = Html::img(['/attachments/file/download-temp', 'filename' => basename($file)], ['class' => 'file-preview-image']);
+                    $initialPreview[] = Html::img(['/attachments/file/download-temp', 'filename' => basename($file)], ['class' => 'file-preview-image kv-preview-data', 'style' => 'width:auto;height:160px;']);
                 } else {
                     $initialPreview[] = Html::beginTag('div', ['class' => 'file-preview-other']) .
                             Html::beginTag('h2') .
@@ -208,8 +209,7 @@ class AttachmentBehavior extends Behavior {
 
         foreach ($this->getFiles($attribute) as $file) {
             if (substr($file->mime_type, 0, 5) === 'image') {
-//                $initialPreview[] = Html::img($file->getDownloadUrl(), ['class' => 'file-preview-image']);
-                $initialPreview[] = Html::img($file->getThumbnailUrl(), ['class' => 'file-preview-image']);
+                $initialPreview[] = Html::img($file->getUrlByFormat($imageFormat), ['class' => 'file-preview-image kv-preview-data', 'style' => 'width:190px;height:auto;']);
             } else {
                 $initialPreview[] = Html::beginTag('div', ['class' => 'file-preview-other']) .
                         Html::beginTag('h2') .
