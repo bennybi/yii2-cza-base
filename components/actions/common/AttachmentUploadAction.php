@@ -12,9 +12,9 @@ use cza\base\vendor\widgets\plupload\ChunkUploader;
 
 /**
  * handle upload upload images as attachemnts of the entity
- * AttachementUploadAction class file.
+ * AttachmentUploadAction class file.
  */
-class AttachementUploadAction extends \cza\base\vendor\widgets\plupload\PluploadAction {
+class AttachmentUploadAction extends \cza\base\vendor\widgets\plupload\PluploadAction {
 
     protected $_organizer;
 

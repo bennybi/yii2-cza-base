@@ -50,6 +50,7 @@ class Plupload extends Widget {
      * @var array
      */
     public $events = [];
+    public $jsUploaderName = 'uploader';
 
     /**
      * @return int the max upload size in MB
@@ -93,7 +94,7 @@ class Plupload extends Widget {
             'filters' => [
                 'max_file_size' => '1000mb',
                 'mime_types' => [
-                    ['title' => "Image files", 'extensions' => "jpg,gif,png"],
+//                    ['title' => "Image files", 'extensions' => "jpg,gif,png"],
 //                    ['title' => "Zip files", 'extensions' => "zip"]
                 ]
             ],
@@ -114,18 +115,17 @@ class Plupload extends Widget {
 
     public function run() {
         // Output
-        echo Html::beginTag('div', $this->htmlOptions);
-        echo Html::endTag('div');
+        echo Html::tag('div', "", $this->htmlOptions);
 
         // Generate event JavaScript
         $events = '';
         foreach ($this->events as $event => $callback) {
-            $events .= "uploader.bind('$event', $callback);\n";
+            $events .= "{$this->jsUploaderName}.bind('$event', $callback);\n";
         }
 //        $this->view->registerJs("var uploader = new plupload.Uploader(" . Json::encode($this->options) . ");\nuploader.init();\n{$events}");
         $js = "";
         $js .= "$('#{$this->htmlOptions['id']}').plupload(" . Json::encode($this->options) . ");\n";
-        $js .= "var uploader = jQuery('#{$this->htmlOptions['id']}').plupload('getUploader');\n";
+        $js .= "var {$this->jsUploaderName} = jQuery('#{$this->htmlOptions['id']}').plupload('getUploader');\n";
         $js .= "{$events};\n";
         $this->view->registerJs($js);
     }

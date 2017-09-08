@@ -14,6 +14,7 @@ class OperationEvent {
     const LINK = "linkEvent.inf";
     const SEARCH = "searchEvent.inf";
     const EDIT = "editEvent.inf";
+    const SORT = "sortEvent.inf";
     const DELETE_BY_ID = "deleteByIdEvent.inf";
     const DELETE_BY_IDS = "deleteByIdsEvent.inf";
     const UNLINK_BY_IDS = "unlinkByIdsEvent.inf";

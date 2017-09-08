@@ -22,6 +22,10 @@ trait BoxTrait {
             'class' => ''
         ],
         'footer' => '',
+        'icons' => [
+            'remove' => 'times', // fa icon name
+            'collapse' => 'minus', // fa icon name
+        ]
     ];
 
     public static function boxBegin($boxConfig = [], $boxOptions = []) {
@@ -30,33 +34,33 @@ trait BoxTrait {
         self::$boxConfig = ArrayHelper::merge(self::$defaultConfig, $boxConfig);
 
         $options = ArrayHelper::merge(['class' => 'box ' . self::$boxConfig['type']], $boxOptions);
-        $str.=Html::beginTag('div', $options);
+        $str .= Html::beginTag('div', $options);
 
         if (!empty(self::$boxConfig['header'])) {
             $header = self::$boxConfig['header'];
-            $str.=Html::beginTag('div', ['class' => 'box-header ' . $header['class']]);
+            $str .= Html::beginTag('div', ['class' => 'box-header ' . $header['class']]);
 
             if ($header['icon']) {
-                $str.=$header['icon'];
+                $str .= $header['icon'];
             }
 
             if (!empty($header['title'])) {
-                $str.=Html::tag('h3', Html::encode($header['title']), ['class' => 'box-title']);
+                $str .= Html::tag('h3', Html::encode($header['title']), ['class' => 'box-title', 'data-widget'=>"collapse"]);
             }
 
             if (trim($header['tools'])) {
-                $str.=Html::beginTag('div', ['class' => 'box-tools pull-right']);
+                $str .= Html::beginTag('div', ['class' => 'box-tools pull-right']);
 
-                foreach (['collapse' => 'minus', 'remove' => 'times'] as $tool => $icon) {
+                foreach (['collapse' => self::$boxConfig['icons']['collapse'], 'remove' => self::$boxConfig['icons']['remove']] as $tool => $icon) {
                     $header['tools'] = str_replace('{' . $tool . '}', self::boxTool($tool, $icon), $header['tools']);
                 }
 
-                $str.=$header['tools'];
+                $str .= $header['tools'];
 
-                $str.=Html::endTag('div');
+                $str .= Html::endTag('div');
             }
 
-            $str.=Html::endTag('div');
+            $str .= Html::endTag('div');
         }
 
         $class = 'box-body ';
@@ -64,7 +68,7 @@ trait BoxTrait {
         if (self::$boxConfig['noPadding']) {
             $class .= ' no-padding';
         }
-        $str.=Html::beginTag('div', ['class' => $class]);
+        $str .= Html::beginTag('div', ['class' => $class]);
         return $str;
     }
 
@@ -74,11 +78,11 @@ trait BoxTrait {
         $str = "";
 
         self::$footerUsed = true;
-        $str.=Html::endTag('div');
-        $str.=Html::beginTag('div', ['class' => 'box-footer']);
+        $str .= Html::endTag('div');
+        $str .= Html::beginTag('div', ['class' => 'box-footer']);
         if (!empty(self::$boxConfig['footer'])) {
-            $str.=self::$boxConfig['footer'];
-            $str.=Html::endTag('div');
+            $str .= self::$boxConfig['footer'];
+            $str .= Html::endTag('div');
         }
         return $str;
     }
@@ -87,16 +91,16 @@ trait BoxTrait {
         $str = "";
 
         if (!self::$footerUsed) {
-            $str.=Html::endTag('div');
+            $str .= Html::endTag('div');
             if (!empty(self::$boxConfig['footer'])) {
-                $str.=Html::beginTag('div', ['class' => 'box-footer']);
-                $str.=self::$boxConfig['footer'];
-                $str.=Html::endTag('div');
+                $str .= Html::beginTag('div', ['class' => 'box-footer']);
+                $str .= self::$boxConfig['footer'];
+                $str .= Html::endTag('div');
             }
         } elseif (empty(self::$boxConfig['footer'])) {
-            $str.=Html::endTag('div');
+            $str .= Html::endTag('div');
         }
-        $str.=Html::endTag('div');
+        $str .= Html::endTag('div');
         return $str;
     }
 

@@ -134,7 +134,7 @@ class Widget extends \yii\base\Widget {
             $id = $this->options['id'];
             $js = [];
             foreach ($this->clientEvents as $event => $handler) {
-                $js[] = "jQuery('#$id').on('$event', $handler);";
+                $js[] = "jQuery('#{$id}').off('{$event}').on('{$event}', {$handler});";
             }
             $this->getView()->registerJs(implode("\n", $js));
         }
