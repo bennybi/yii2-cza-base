@@ -36,7 +36,7 @@ class PhotosList extends Widget {
     public function run() {
 
         $this->dataProvider = new ActiveDataProvider([
-            'query' => $this->model->getAttachementImages($this->code),
+            'query' => $this->model->getAttachmentImages($this->code),
             'pagination' => [
                 'pageSize' => $this->pageSize,
                 'params' => Yii::$app->request->get(),

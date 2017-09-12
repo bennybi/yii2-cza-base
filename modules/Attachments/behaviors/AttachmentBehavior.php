@@ -177,7 +177,7 @@ class AttachmentBehavior extends Behavior {
         return $fileQuery->all();
     }
 
-    public function getOneAttachment($attribute, $order = ['id' => SORT_ASC]) {
+    public function getOneAttachment($attribute, $order = ['position' => SORT_DESC]) {
         $modelClass = $this->attributesDefinition[$attribute]['class'];
         $fileQuery = $modelClass::find()
                 ->andWhere([

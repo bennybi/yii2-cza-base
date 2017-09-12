@@ -36,7 +36,7 @@ class FilesList extends Widget {
     public function run() {
 
         $this->dataProvider = new ActiveDataProvider([
-            'query' => $this->model->getAttachementFiles($this->code),
+            'query' => $this->model->getAttachmentFiles($this->code),
             'pagination' => [
                 'pageSize' => $this->pageSize,
                 'params' => Yii::$app->request->get(),

@@ -76,4 +76,12 @@ class Password extends \yii\base\Component {
         return $password;
     }
 
+    public function hexEncode($input) {
+        return bin2hex($input);
+    }
+
+    public function hexDecode($input) {
+        return pack("H*", $input);
+    }
+
 }
