@@ -23,7 +23,7 @@ class Widget extends \yii\base\Widget {
     const UI_BOOTSTRAP = 'bootstrap';
     const UI_JQUERYUI = 'jui';
 
-    private $_data = [];
+    protected $_data = [];
     protected $_controller = null;
 
     /**
