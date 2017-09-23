@@ -31,6 +31,18 @@ class AttachmentBehavior extends Behavior {
 
     /*
      * accept attributes to class map, determine to crud related attachments
+     * array, for example:
+     * 'photos' => [
+      'class' => EntityAttachmentImage::className(),
+      'validator' => 'image',
+      'enableVersions' => false,
+      'rules' => [
+      'maxFiles' => 5,
+      'extensions' => Yii::$app->params['config']['upload']['imageWhiteExts'],
+      'maxSize' => Yii::$app->params['config']['upload']['maxFileSize'],
+      ]
+      ],
+     * 
      */
     public $attributesDefinition = [];
 
@@ -88,10 +100,10 @@ class AttachmentBehavior extends Behavior {
                 }
             }
         }
-
-        if (\file_exists($userTempDir)) {
-            \rmdir($userTempDir);
-        }
+        /* cannot delete tmp dir, bcz it will affect realted model's images generation */
+//        if (\file_exists($userTempDir)) {
+//            \rmdir($userTempDir);
+//        }
     }
 
     public function deleteByRefAttribute($refAttribute) {
