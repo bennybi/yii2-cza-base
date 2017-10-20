@@ -24,7 +24,7 @@ class TencentMapAsset extends AssetBundle {
 //    public $css = [];
     public $js = [
 //        'http://map.qq.com/api/js?v=2.exp',
-        'http://map.qq.com/api/js?v=2.exp&libraries=convertor',
+        'https://map.qq.com/api/js?v=2.exp&libraries=convertor',
     ];
     public $depends = [
         'yii\web\JqueryAsset',

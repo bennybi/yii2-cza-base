@@ -50,7 +50,7 @@ class AttachmentUploadAction extends \cza\base\vendor\widgets\plupload\PluploadA
     public $onComplete;
     public $attachementClass;
     public $entityClass;
-    public $entityAttribute = ' album';
+    public $entityAttribute = 'album';
 
     /**
      * Initializes the action and ensures the temp path exists.
