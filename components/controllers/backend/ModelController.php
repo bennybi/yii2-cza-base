@@ -33,7 +33,7 @@ class ModelController extends Controller {
     public function actions() {
         return \yii\helpers\ArrayHelper::merge(parent::actions(), [
                     'editColumn' => [                                       // identifier for your editable action
-                        'class' => \kartik\grid\EditableColumnAction::className(), // action class name
+                        'class' => \backend\components\actions\EditableColumnAction::className(), // extends \kartik\grid\EditableColumnAction
                         'modelClass' => $this->modelClass, // the update model class
                     ],
                     'translation-save' => [

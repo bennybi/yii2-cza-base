@@ -23,7 +23,8 @@ echo Html::beginTag('div', $options);
 Box::begin([
     'options' => ['id' => $model->getPrefixName('box')],
     'config' => [
-        'type' => 'box-warning collapsed-box',
+        'type' => 'box-warning',
+//        'type' => 'box-warning collapsed-box',
         'header' => [
             'title' => Yii::t('app.c2', 'Expend Uploader'),
             'tools' => '{collapse}',

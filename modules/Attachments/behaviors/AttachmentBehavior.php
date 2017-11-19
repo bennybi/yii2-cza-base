@@ -28,7 +28,9 @@ class AttachmentBehavior extends Behavior {
 
     protected $_refAttribues = [];
     protected $_organizer;
-
+    public $config = [
+        'entity_class' => '',
+    ];
     /*
      * accept attributes to class map, determine to crud related attachments
      * array, for example:
@@ -74,6 +76,10 @@ class AttachmentBehavior extends Behavior {
             $this->owner->addRule($refAttribute, $this->attributesDefinition[$refAttribute]['validator'], $this->attributesDefinition[$refAttribute]['rules']);
             $this->owner->addRule($refAttribute, $this->attributesDefinition[$refAttribute]['validator'], array_replace_recursive(['on' => ActiveRecord::SCENARIO_UPLOAD], $this->attributesDefinition[$refAttribute]['rules']));
         }
+    }
+
+    public function getEntityClass() {
+        return empty($this->config['entity_class']) ? $this->owner->className() : $this->config['entity_class'];
     }
 
     public function saveUploads($event) {
@@ -154,7 +160,7 @@ class AttachmentBehavior extends Behavior {
         $file->setAttributes([
             'name' => pathinfo($filePath, PATHINFO_FILENAME),
             'entity_id' => $owner->id,
-            'entity_class' => $owner->className(),
+            'entity_class' => $this->getEntityClass(),
             'entity_attribute' => $attribute,
             'hash' => $fileHash,
             'size' => filesize($filePath),
@@ -181,7 +187,7 @@ class AttachmentBehavior extends Behavior {
         $fileQuery = $modelClass::find()
                 ->andWhere([
             'entity_id' => $this->owner->id,
-            'entity_class' => $this->owner->className(),
+            'entity_class' => $this->getEntityClass(),
             'entity_attribute' => $attribute,
         ]);
         $fileQuery->orderBy($order);
@@ -194,7 +200,7 @@ class AttachmentBehavior extends Behavior {
         $fileQuery = $modelClass::find()
                 ->andWhere([
             'entity_id' => $this->owner->id,
-            'entity_class' => $this->owner->className(),
+            'entity_class' => $this->getEntityClass(),
             'entity_attribute' => $attribute,
         ]);
         $fileQuery->orderBy($order);
