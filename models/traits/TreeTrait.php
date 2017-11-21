@@ -296,6 +296,8 @@ trait TreeTrait {
             $this->nodeRemovalErrors = [];
             $module = Yii::$app->controller->module;
             extract($module->treeStructure);
+            extract($module->dataStructure);
+            
             if ($this->isRemovableAll()) {
                 $children = $this->children()->all();
                 foreach ($children as $child) {
@@ -313,6 +315,7 @@ trait TreeTrait {
             }
             if ($currNode) {
                 $this->active = false;
+                
                 if (!$this->save()) {
                     /** @noinspection PhpUndefinedFieldInspection */
                     /** @noinspection PhpUndefinedVariableInspection */
@@ -324,6 +327,7 @@ trait TreeTrait {
                     return false;
                 }
             }
+            
             return true;
         } else {
             return $this->removable_all || $this->isRoot() && $this->children()->count() == 0 ?
