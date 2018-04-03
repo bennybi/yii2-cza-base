@@ -92,7 +92,7 @@ class AttachmentBehavior extends Behavior {
                 $this->deleteByRefAttribute($refAttribute);
 
                 foreach ($files as $file) {
-                    if (!$file->saveAs($userTempDir . $file->name)) {
+                    if (!$file->saveAs($userTempDir . $file->name, false)) {
                         throw new \Exception(\Yii::t('yii', 'File upload failed.'));
                     }
                 }
