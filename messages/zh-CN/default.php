@@ -19,5 +19,6 @@ return [
     '{attribute} must be alphanumeric.' => '{attribute}必须全是字母或数字.',
     'Export Page Data' => '导出页面数据',
     'Export All Data' => '导出所有数据',
+    'Error: attachment not found!' => '错误：文件未能找到！',
     '' => '',
 ];
