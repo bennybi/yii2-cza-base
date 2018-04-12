@@ -9,6 +9,7 @@
 namespace cza\base\models\entity;
 
 use cza\base\models\ActiveRecord;
+use cza\base\models\statics\EntityModelStatus;
 
 /**
  * This is the base model class for the nested set tree structure
@@ -80,5 +81,9 @@ class EntityTree extends ActiveRecord {
      * @var boolean attribute to cache the `active` state before a model update.
      */
     public $activeOrig = true;
+
+    public static function getRoot() {
+        return static::findOne(['lft' => 1, 'status' => EntityModelStatus::STATUS_ACTIVE]);
+    }
 
 }
