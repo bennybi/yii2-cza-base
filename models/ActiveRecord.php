@@ -85,7 +85,8 @@ class ActiveRecord extends \yii\db\ActiveRecord {
      * @param type $condition
      * @return array
      */
-    public static function getOptionsListCallable($keyField, $valField, $condition = '', $params = ['limit' => 10]) {
+    public static function getOptionsListCallable($keyField, $valField, $condition = '', $params = []) {
+        $params = ArrayHelper::merge(['limit' => 10], $params);
         $class = static::className();
         $items = [];
         $models = $class::find()->andWhere($condition)->limit($params['limit'])->all();

@@ -61,9 +61,9 @@ class OptionsListAction extends \yii\rest\Action {
         $modelClass = $this->modelClass;
         $listMethod = $this->listMethod;
         if (!is_null($params['q'])) {
-            $data['results'] = $modelClass::$listMethod($this->keyAttribute, $this->valueAttribute, "{$this->queryAttribute} like '%{$params['q']}%'");
+            $data['results'] = $modelClass::$listMethod($this->keyAttribute, $this->valueAttribute, "{$this->queryAttribute} like '%{$params['q']}%'", $params);
         } else {
-            $data['results'] = $modelClass::$listMethod($this->keyAttribute, $this->valueAttribute);
+            $data['results'] = $modelClass::$listMethod($this->keyAttribute, $this->valueAttribute, '', $params);
         }
         return $data;
     }
