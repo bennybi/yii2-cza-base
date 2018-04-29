@@ -80,8 +80,18 @@ trait TreeTrait {
      */
     public function behaviors() {
         $module = Yii::$app->controller->module;
-        $settings = ['class' => NestedSetsBehavior::className()] + $module->treeStructure;
-        return empty($module->treeBehaviorName) ? array_merge_recursive(parent::behaviors(), [$settings]) : array_merge_recursive(parent::behaviors(), [$module->treeBehaviorName => $settings]);
+        if ($module && isset($module->treeStructure)) {
+            $settings = ['class' => NestedSetsBehavior::className()] + $module->treeStructure;
+            return empty($module->treeBehaviorName) ? array_merge_recursive(parent::behaviors(), [$settings]) : array_merge_recursive(parent::behaviors(), [$module->treeBehaviorName => $settings]);
+        } else {
+            $settings = ['class' => NestedSetsBehavior::className()] + [
+                'treeAttribute' => 'root',
+                'leftAttribute' => 'lft',
+                'rightAttribute' => 'rgt',
+                'depthAttribute' => 'lvl',
+            ];
+           return array_merge_recursive(parent::behaviors(), [$settings]);
+        }
     }
 
     /**
@@ -297,7 +307,7 @@ trait TreeTrait {
             $module = Yii::$app->controller->module;
             extract($module->treeStructure);
             extract($module->dataStructure);
-            
+
             if ($this->isRemovableAll()) {
                 $children = $this->children()->all();
                 foreach ($children as $child) {
@@ -315,7 +325,7 @@ trait TreeTrait {
             }
             if ($currNode) {
                 $this->active = false;
-                
+
                 if (!$this->save()) {
                     /** @noinspection PhpUndefinedFieldInspection */
                     /** @noinspection PhpUndefinedVariableInspection */
@@ -327,7 +337,7 @@ trait TreeTrait {
                     return false;
                 }
             }
-            
+
             return true;
         } else {
             return $this->removable_all || $this->isRoot() && $this->children()->count() == 0 ?
