@@ -25,7 +25,7 @@
         
         "dmstr/yii2-adminlte-asset": "*",
         "almasaeed2010/adminlte": "~2.0",
-        "machour/yii2-adminlte-widgets": "dev-master",
+        "machour/yii2-adminlte-widgets": "*",
         
         "kartik-v/yii2-krajee-base": "@dev",
         "kartik-v/yii2-widgets": "*",
