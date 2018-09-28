@@ -116,7 +116,7 @@ class ActiveRecord extends \yii\db\ActiveRecord {
     }
 
     public function multipleDeleteByIds(array $ids) {
-        if (count($ids > 0)) {
+        if (count($ids) > 0) {
 //            $condition = ['in', 'id', $ids];
 //            $items = static::find()->where(['in', 'id', $ids])->all();
             $items = static::findAll(['id' => $ids]);
