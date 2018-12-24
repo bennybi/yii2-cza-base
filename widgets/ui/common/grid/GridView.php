@@ -46,7 +46,7 @@ class GridView extends KaGridView {
         $view = $this->getView();
         $js = "";
 
-        $js.= "jQuery(document).off('" . OperationEvent::DELETE_BY_IDS . "').on('" . OperationEvent::DELETE_BY_IDS . "', '#{$this->id}', function(e, data){
+        $js.= "jQuery(document).off('" . OperationEvent::DELETE_BY_IDS . "', '#{$this->id}').on('" . OperationEvent::DELETE_BY_IDS . "', '#{$this->id}', function(e, data){
                 var lib = window['krajeeDialog'];
                 var ids = jQuery('#{$this->id}').yiiGridView('getSelectedRows');
                 lib.confirm('" . Yii::t('app.c2', 'Are you sure to delete these items?') . "', function (result) {
@@ -74,7 +74,7 @@ class GridView extends KaGridView {
         $view = $this->getView();
         $js = "";
 
-        $js.= "jQuery(document).off('" . OperationEvent::REFRESH . "').on('" . OperationEvent::REFRESH . "', '#{$this->id}', function(e, data){
+        $js.= "jQuery(document).off('" . OperationEvent::REFRESH . "', '#{$this->id}').on('" . OperationEvent::REFRESH . "', '#{$this->id}', function(e, data){
                 jQuery.pjax.reload({container: '#' + '{$this->pjaxSettings['options']['id']}'});
             });";
 
