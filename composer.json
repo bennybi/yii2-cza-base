@@ -48,9 +48,7 @@
         "yii2tech/ar-position": "*",
         "vova07/yii2-imperavi-widget": "*",
         "ayrozjlc/yii2-blockui": "dev-master",
-        "creocoder/yii2-nested-sets": "~0.9",
-        "maxwen/yii2-easy-wechat": "*",
-        "bower-asset/jstree": "*"
+        "creocoder/yii2-nested-sets": "~0.9"
     },
     "autoload": {
         "psr-4": {
