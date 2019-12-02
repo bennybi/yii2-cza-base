@@ -88,6 +88,8 @@ class GridView extends KaGridView {
         if ($this->export === false) {
             return;
         }
+        parent::initExport();
+        
         $this->exportConversions = array_replace_recursive(
                 [
             ['from' => self::ICON_ACTIVE, 'to' => Yii::t('cza', 'Active')],
