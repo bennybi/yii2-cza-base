@@ -20,6 +20,7 @@ abstract class EntityDetail extends Widget {
     public $tabTitle = '';
     public $withBaseInfoTab = true;  // need entity model support
     public $withProfileTab = false;  // need (x)Profile model support
+    public $withConfigTab = false;  // need (x)Config model support
     public $withTranslationTabs = true; // need (x)Lang model support
 
     public function getTabsId() {
@@ -45,6 +46,10 @@ abstract class EntityDetail extends Widget {
 
         if ($this->withProfileTab) {
             $items[] = $this->getProfileTab();
+        }
+
+        if ($this->withConfigTab) {
+            $items[] = $this->getConfigTab();
         }
 
         if ($this->withBaseInfoTab) {
@@ -84,6 +89,26 @@ abstract class EntityDetail extends Widget {
         }
 
         return $this->_tabs['PROFILE_TAB'];
+    }
+
+    public function getConfigTab() {
+        if (!isset($this->_tabs['CONFIG_TAB'])) {
+            if (!$this->model->isNewRecord) {
+                $this->_tabs['CONFIG_TAB'] = [
+                    'label' => Yii::t('app.c2', 'Config'),
+                    'content' => $this->controller->renderPartial('_config_form', ['model' => $this->model->config, 'entityModel' => $this->model]),
+                    'enable' => true,
+                ];
+            } else {
+                $this->_tabs['CONFIG_TAB'] = [
+                    'label' => Yii::t('app.c2', 'Config'),
+                    'content' => "",
+                    'enable' => false,
+                ];
+            }
+        }
+
+        return $this->_tabs['CONFIG_TAB'];
     }
 
     /**

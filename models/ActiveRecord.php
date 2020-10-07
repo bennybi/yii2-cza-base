@@ -133,4 +133,8 @@ class ActiveRecord extends \yii\db\ActiveRecord {
         $this->loadDefaultValues();
     }
 
+    public function getShortName() {
+        return (new \ReflectionClass($this))->getShortName();
+    }
+
 }
