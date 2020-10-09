@@ -15,7 +15,7 @@ use cza\base\models\statics\ResponseDatum;
  * Descriptions
  *
  *
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @link http://www.cciza.com/
  * @copyright 2014-2016 CCIZA Software LLC
  * @license
@@ -31,8 +31,6 @@ class ProfileSaveAction extends \yii\rest\Action {
             call_user_func($this->checkAccess, $this->id);
         }
         $params = Yii::$app->request->post();
-//Yii::info($params);
-//Yii::info($_FILES);
         if (isset($params[$this->entityIdAttribute])) {
             $model = $this->controller->retrieveModel($params[$this->entityIdAttribute]);
         } else {

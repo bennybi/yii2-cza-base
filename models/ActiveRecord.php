@@ -3,7 +3,7 @@
 /**
  * 
  * 
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @link http://www.cciza.com/
  * @copyright 2014-2016 CCIZA Software LLC
  * @license
@@ -25,7 +25,7 @@ use cza\base\models\statics\EntityModelStatus;
  * CZA ActiveRecord is the base class for classes representing relational data in terms of objects.
  *
  *
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @since 2.0
  */
 class ActiveRecord extends \yii\db\ActiveRecord {

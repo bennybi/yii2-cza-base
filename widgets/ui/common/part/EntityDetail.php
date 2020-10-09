@@ -8,15 +8,21 @@ use cza\base\widgets\Widget;
 /**
  * Entity Detail Widget
  * 
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @link http://www.cciza.com/
  * @copyright 2014-2016 CCIZA Software LLC
  * @license
  */
 abstract class EntityDetail extends Widget {
 
+    const TAB_BASE = 0;
+    const TAB_PROFILE = 1;
+    const TAB_CONFIG = 2;
+    const TAB_LANG = 3;
+
     protected $_tabs = [];
     public $model;
+    public $showTab = 0;
     public $tabTitle = '';
     public $withBaseInfoTab = true;  // need entity model support
     public $withProfileTab = false;  // need (x)Profile model support
@@ -54,9 +60,9 @@ abstract class EntityDetail extends Widget {
 
         if ($this->withBaseInfoTab) {
             $items[] = [
-                'label' => Yii::t('app.c2', 'Base Information'),
-                'content' => $this->controller->renderPartial('_form', [ 'model' => $this->model,]),
-                'active' => true,
+                'label' => '<i class="fa fa-list-alt"></i> ' . Yii::t('app.c2', 'Base Information'),
+                'content' => $this->controller->renderPartial('_form', ['model' => $this->model,]),
+                'active' => ($this->showTab == static::TAB_BASE),
             ];
         }
 
@@ -75,13 +81,14 @@ abstract class EntityDetail extends Widget {
         if (!isset($this->_tabs['PROFILE_TAB'])) {
             if (!$this->model->isNewRecord) {
                 $this->_tabs['PROFILE_TAB'] = [
-                    'label' => Yii::t('app.c2', 'Profile'),
+                    'label' => '<i class="fa fa-list-alt"></i> ' . Yii::t('app.c2', 'Profile'),
                     'content' => $this->controller->renderPartial('_profile_form', ['model' => $this->model->profile, 'entityModel' => $this->model]),
                     'enable' => true,
+                    'active' => ($this->showTab == static::TAB_PROFILE),
                 ];
             } else {
                 $this->_tabs['PROFILE_TAB'] = [
-                    'label' => Yii::t('app.c2', 'Profile'),
+                    'label' => '<i class="fa fa-list-alt"></i> ' . Yii::t('app.c2', 'Profile'),
                     'content' => "",
                     'enable' => false,
                 ];
@@ -95,13 +102,14 @@ abstract class EntityDetail extends Widget {
         if (!isset($this->_tabs['CONFIG_TAB'])) {
             if (!$this->model->isNewRecord) {
                 $this->_tabs['CONFIG_TAB'] = [
-                    'label' => Yii::t('app.c2', 'Config'),
-                    'content' => $this->controller->renderPartial('_config_form', ['model' => $this->model->config, 'entityModel' => $this->model]),
+                    'label' => '<i class="fa fa-wrench"></i> ' . Yii::t('app.c2', 'Config'),
+                    'content' => $this->controller->renderPartial('_config_form', ['model' => $this->model->getConfigForm(), 'entityModel' => $this->model]),
                     'enable' => true,
+                    'active' => ($this->showTab == static::TAB_CONFIG),
                 ];
             } else {
                 $this->_tabs['CONFIG_TAB'] = [
-                    'label' => Yii::t('app.c2', 'Config'),
+                    'label' => '<i class="fa fa-wrench"></i> ' . Yii::t('app.c2', 'Config'),
                     'content' => "",
                     'enable' => false,
                 ];

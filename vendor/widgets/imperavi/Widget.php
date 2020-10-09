@@ -8,7 +8,7 @@ use yii\helpers\Json;
  * Warpper of \yii\imperavi\Widget
  *
  *
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @link http://www.cciza.com/
  * @copyright 2014-2016 CCIZA Software LLC
  * @license

@@ -3,7 +3,7 @@
 /**
  * 
  * 
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @link http://www.cciza.com/
  * @copyright 2014-2016 CCIZA Software LLC
  * @license
@@ -19,7 +19,7 @@ use yii\db\ActiveRecord;
 /**
  * support db entity i18n manipulation, refer to https://github.com/2amigos/yii2-translateable-behavior, i modified/added some new features
  * 
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @link http://www.cciza.com/
  * @copyright 2014-2016 CCIZA Software LLC
  * @license

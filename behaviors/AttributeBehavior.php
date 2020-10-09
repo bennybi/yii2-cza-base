@@ -42,7 +42,7 @@ use yii\base\Event;
  * }
  * ~~~
  *
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @author Luciano Baraglia <luciano.baraglia@gmail.com>
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0

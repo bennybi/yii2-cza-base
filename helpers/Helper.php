@@ -3,7 +3,7 @@
 /**
  * 
  * 
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @link http://www.cciza.com/
  * @copyright 2014-2016 CCIZA Software LLC
  * @license
@@ -19,7 +19,7 @@ use yii\helpers\Url;
  * 
  *  @property \cza\base\components\utils\FolderOrganizer $folderOrganizer
  *  @property \cza\base\vendor\utils\SimpleHTMLDOM\SimpleHTMLDOM $simpleHTMLDOM
- *  @author Ben Bi <ben@cciza.com>
+ *  @author Ben Bi <bennybi@qq.com>
  *  @since 2.0
  * 
  * 

@@ -3,7 +3,7 @@
 /**
  * ActiveForm is a widget that builds an interactive HTML form for one or multiple data models.
  * 
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @link http://www.cciza.com/
  * @copyright 2014-2016 CCIZA Software LLC
  * @license

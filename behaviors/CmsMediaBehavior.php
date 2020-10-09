@@ -3,7 +3,7 @@
 /**
  * 
  * handle medias(image/files) attached in cms content fields
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @link http://www.cciza.com/
  * @copyright 2014-2016 CCIZA Software LLC
  * @license
@@ -20,7 +20,7 @@ use cza\base\interfaces\ITranslationActiveRecord;
  * Descriptions
  * attache media-operations of cms fields when (after create/before update/before delete) the model
  *
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @link http://www.cciza.com/
  * @copyright 2014-2016 CCIZA Software LLC
  * @license

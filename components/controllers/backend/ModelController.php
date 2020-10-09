@@ -18,7 +18,7 @@ use cza\base\models\statics\ResponseDatum;
  * for model CRUD usage.
  *
  *
- * @author Ben Bi <ben@cciza.com>
+ * @author Ben Bi <bennybi@qq.com>
  * @link http://www.cciza.com/
  * @copyright 2014-2016 CCIZA Software LLC
  * @license
@@ -43,6 +43,11 @@ class ModelController extends Controller {
                     ],
                     'profile-save' => [
                         'class' => '\cza\base\components\actions\backend\ProfileSaveAction',
+                        'modelClass' => $this->modelClass,
+                        'checkAccess' => [$this, 'checkAccess'],
+                    ],
+                    'config-save' => [
+                        'class' => '\cza\base\components\actions\backend\ConfigSaveAction',
                         'modelClass' => $this->modelClass,
                         'checkAccess' => [$this, 'checkAccess'],
                     ],
