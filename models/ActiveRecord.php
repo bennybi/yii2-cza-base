@@ -61,9 +61,9 @@ class ActiveRecord extends \yii\db\ActiveRecord {
      * @param string $valFiled Value
      * @return key-value array
      */
-    public static function getHashMap($keyField, $valField, $condition = '') {
+    public static function getHashMap($keyField, $valField, $condition = '', $orderBy = 'position desc') {
         $class = static::className();
-        return ArrayHelper::map($class::find()->select([$keyField, $valField])->andWhere($condition)->asArray()->all(), $keyField, $valField);
+        return ArrayHelper::map($class::find()->select([$keyField, $valField])->andWhere($condition)->orderBy($orderBy)->asArray()->all(), $keyField, $valField);
     }
 
     /**
@@ -73,9 +73,9 @@ class ActiveRecord extends \yii\db\ActiveRecord {
      * @param type $condition
      * @return array
      */
-    public static function getOptionsList($keyField, $valField, $condition = '', $params = ['limit' => 50]) {
+    public static function getOptionsList($keyField, $valField, $condition = '', $params = ['limit' => 50], $orderBy = 'position desc') {
         $class = static::className();
-        return $class::find()->select([$keyField, $valField])->andWhere($condition)->limit($params['limit'])->asArray()->all();
+        return $class::find()->select([$keyField, $valField])->andWhere($condition)->orderBy($orderBy)->limit($params['limit'])->asArray()->all();
     }
 
     /**
@@ -85,10 +85,10 @@ class ActiveRecord extends \yii\db\ActiveRecord {
      * @param type $condition
      * @return array
      */
-    public static function getOptionsListCallable($keyField, $valField, $condition = '', $params = ['limit' => 10]) {
+    public static function getOptionsListCallable($keyField, $valField, $condition = '', $params = ['limit' => 10], $orderBy = 'position desc') {
         $class = static::className();
         $items = [];
-        $models = $class::find()->andWhere($condition)->limit($params['limit'])->all();
+        $models = $class::find()->andWhere($condition)->orderBy($orderBy)->limit($params['limit'])->all();
         foreach ($models as $model) {
             $items[] = [
                 $keyField => $model->$keyField,
