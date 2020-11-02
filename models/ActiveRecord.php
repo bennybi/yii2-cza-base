@@ -61,9 +61,24 @@ class ActiveRecord extends \yii\db\ActiveRecord {
      * @param string $valFiled Value
      * @return key-value array
      */
-    public static function getHashMap($keyField, $valField, $condition = '', $orderBy = 'position desc') {
+    public static function getHashMap($keyField, $valField, $condition = '', $orderBy = 'position desc', $limit = 200) {
         $class = static::className();
         return ArrayHelper::map($class::find()->select([$keyField, $valField])->andWhere($condition)->orderBy($orderBy)->asArray()->all(), $keyField, $valField);
+    }
+
+    /**
+     * 
+     * @param type $keyField
+     * @param type $valField
+     * @param type $condition
+     * @param type $params accept ['firstItem' => [], 'limit' => 50, 'orderBy' => 'position desc']
+     * @return type
+     */
+    public static function getOptions($keyField, $valField, $condition = '', $params = []) {
+        $defauts = ArrayHelper::merge(['firstItem' => [], 'limit' => 50, 'orderBy' => 'position desc'], $params);
+        $options = $defauts['firstItem'];
+        $options += static::getHashMap($keyField, $valField, $condition, $defauts['orderBy'], $defauts['limit']);
+        return $options;
     }
 
     /**

@@ -35,11 +35,8 @@ class HtmlResponseFormatter extends Component implements ResponseFormatterInterf
             $this->contentType .= '; charset=' . $response->charset;
         }
         $response->getHeaders()->set('Content-Type', $this->contentType);
-        if ($response->data !== null) {
-            if (is_string($response->data))
-                $response->content = $response->data;
-            else
-                $response->content = var_export($response->data, true);
+        if ($response->data !== null && is_string($response->data)) {
+            $response->content = $response->data;
         }
     }
 

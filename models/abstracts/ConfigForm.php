@@ -59,7 +59,7 @@ abstract class ConfigForm extends Model {
         if (!$this->beforeSave()) {
             return false;
         }
-
+//Yii::info($this->attributes);
         $this->model->saveDataItems($this->attributes);
 //        if (!$this->model->saveDataItems($this->attributes)) {
 //            $this->addError('tips', \Yii::t('app.c2', "{s1} cannot be saved. \n Reason: {s2}", [
