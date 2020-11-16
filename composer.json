@@ -24,7 +24,7 @@
         "rmrevin/yii2-fontawesome": ">=2.9",
         
         "dmstr/yii2-adminlte-asset": "*",
-        "almasaeed2010/adminlte": "*",
+        "almasaeed2010/adminlte": "~2.0",
         "machour/yii2-adminlte-widgets": "*",
         
         "kartik-v/yii2-krajee-base": "@dev",
