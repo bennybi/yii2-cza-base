@@ -1,10 +1,9 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: Алимжан
- * Date: 27.01.2015
- * Time: 12:24
+ *  AttachmentBehavior
+ * @author Ben Bi <bennybi@qq.com>
+ * @license
  */
 
 namespace cza\base\modules\Attachments\behaviors;
@@ -28,6 +27,8 @@ class AttachmentBehavior extends Behavior {
 
     protected $_refAttribues = [];
     protected $_organizer;
+    public $dirMode = 0775;
+    public $tempPath = '@runtime/uploads/temp';
     public $config = [
         'entity_class' => '',
     ];
@@ -59,6 +60,9 @@ class AttachmentBehavior extends Behavior {
             $this->_refAttribues[$k] = "";
         }
         $this->_organizer = Yii::$app->czaHelper->folderOrganizer;
+        if (!is_dir($this->tempPath)) {
+            FileHelper::createDirectory($this->tempPath, $this->dirMode, true);
+        }
     }
 
     public function events() {
@@ -68,6 +72,95 @@ class AttachmentBehavior extends Behavior {
             ActiveRecord::EVENT_AFTER_UPDATE => 'saveUploads',
             ActiveRecord::EVENT_AFTER_DELETE => 'deleteUploads'
         ];
+    }
+
+    /**
+     * Base64附件
+     * @param $stream string
+     * @param $owner
+     * @return bool|File
+     * @throws Exception
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function attachFileBase64($stream, $attribute, $extras = []) {
+        $owner = $this->owner;
+        if (empty($owner->id)) {
+            throw new Exception('Parent model must have ID when you attaching a file');
+        }
+
+        $uploadedFile = $this->makeTempFile($stream);
+        $filePath = $uploadedFile->tempName;
+        if (!\file_exists($filePath)) {
+            throw new Exception("File {$filePath} not exists");
+        }
+
+        $fileHash = md5(microtime(true) . $filePath);
+        $fileType = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        $newFileName = "{$fileHash}.{$fileType}";
+
+        $newFilePath = $this->_organizer->getFullUploadStoreDir($newFileName, $owner) . '/' . $newFileName;
+
+        if (!copy($filePath, $newFilePath)) {
+            throw new Exception("Cannot copy file! {$filePath}  to {$newFilePath}");
+        }
+        $file = new $this->attributesDefinition[$attribute]['class'];
+        if (isset($this->attributesDefinition[$attribute]['enableVersions'])) {
+            $file->setEnableVersions($this->attributesDefinition[$attribute]['enableVersions']);
+        }
+
+        $file->loadDefaultValues();
+        $file->setAttributes([
+            'name' => pathinfo($filePath, PATHINFO_FILENAME),
+            'entity_id' => $owner->id,
+            'entity_class' => $this->getEntityClass(),
+            'entity_attribute' => $attribute,
+            'hash' => $fileHash,
+            'size' => filesize($filePath),
+            'name' => $extras['name'] ?? $newFileName,
+            'label' => $extras['label'] ?? "",
+            'content' => $extras['content'] ?? "",
+            'extension' => $fileType,
+            'mime_type' => FileHelper::getMimeType($filePath),
+            'logic_path' => $this->_organizer->getUploadLogicPath($fileHash, $owner),
+        ]);
+
+        if ($file->save()) {
+            @\unlink($filePath);
+            return $file;
+        } else {
+            return false;
+        }
+    }
+
+    protected function makeTempFile($attribute) {
+        $tempName = tempnam($this->tempPath, 'ub_');
+        if (preg_match('/^data:([\w\/]+);base64/i', $attribute, $matches)) {
+            list($type, $data) = explode(';', $attribute);
+            list(, $data) = explode(',', $attribute);
+            $data = base64_decode($data);
+
+            $newName = $tempName;
+            $name = basename($tempName);
+
+            if (!empty($matches[1])) {
+                $extensions = FileHelper::getExtensionsByMimeType($matches[1]);
+                $name .= '.' . end($extensions);
+                $newName .= '.' . end($extensions);
+                rename($tempName, $newName);
+            }
+
+            if (!file_put_contents($newName, $data)) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        return new UploadedFile([
+            'name' => $name,
+            'type' => $type,
+            'tempName' => $newName
+        ]);
     }
 
     public function applyRules() {
@@ -123,6 +216,10 @@ class AttachmentBehavior extends Behavior {
         foreach ($refAttributes as $refAttribute) {
             $this->deleteByRefAttribute($refAttribute);
         }
+    }
+
+    public function detachFile($refAttribute) {
+        $this->deleteByRefAttribute($refAttribute);
     }
 
     /**
