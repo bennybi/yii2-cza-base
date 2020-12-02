@@ -21,6 +21,34 @@ use yii\helpers\ArrayHelper;
 use yii\base\Exception;
 use cza\base\models\statics\ImageSize;
 
+/**
+ * 附件行为
+ * example:
+ * public function behaviors() {
+  return ArrayHelper::merge(parent::behaviors(), [
+  // handle attachments
+  'attachmentsBehavior' => [
+  'class' => AttachmentBehavior::class,
+  'config' => [
+  'entity_class' => static::class,
+  'delSrcFileAfterAttach' => false, // 附件后不删除源文件
+  ],
+  'attributesDefinition' => [
+  'avatar' => [
+  'class' => EntityAttachmentImage::class,
+  'validator' => 'image',
+  'enableVersions' => true, // determine to generate difference size images
+  'rules' => [
+  'maxFiles' => 1,
+  'extensions' => Yii::$app->params['config']['upload']['imageWhiteExts'],
+  'maxSize' => Yii::$app->params['config']['upload']['maxFileSize'],
+  ]
+  ],
+  ],
+  ],
+  ]);
+  }
+ */
 class AttachmentBehavior extends Behavior {
 
     use ModuleTrait;
@@ -28,10 +56,9 @@ class AttachmentBehavior extends Behavior {
     protected $_refAttribues = [];
     protected $_organizer;
     public $dirMode = 0775;
+    public $entityIdAttribute = 'id';
     public $tempPath = '@runtime/uploads/temp';
-    public $config = [
-        'entity_class' => '',
-    ];
+    public $config;
     /*
      * accept attributes to class map, determine to crud related attachments
      * array, for example:
@@ -51,6 +78,11 @@ class AttachmentBehavior extends Behavior {
 
     public function init() {
         parent::init();
+
+        $this->config = ArrayHelper::merge([
+                    'entity_class' => '',
+                    'delSrcFileAfterAttach' => true,
+                        ], $this->config);
 
         if (empty($this->attributesDefinition)) {
             throw new Exception('{attributesDefinition} is required!');
@@ -84,7 +116,8 @@ class AttachmentBehavior extends Behavior {
      */
     public function attachFileBase64($stream, $attribute, $extras = []) {
         $owner = $this->owner;
-        if (empty($owner->id)) {
+        $idAttribute = $this->entityIdAttribute;
+        if (empty($owner->$idAttribute)) {
             throw new Exception('Parent model must have ID when you attaching a file');
         }
 
@@ -93,12 +126,10 @@ class AttachmentBehavior extends Behavior {
         if (!\file_exists($filePath)) {
             throw new Exception("File {$filePath} not exists");
         }
-
         $fileHash = md5(microtime(true) . $filePath);
         $fileType = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
         $newFileName = "{$fileHash}.{$fileType}";
-
-        $newFilePath = $this->_organizer->getFullUploadStoreDir($newFileName, $owner) . '/' . $newFileName;
+        $newFilePath = $this->_organizer->getFullUploadStoreDir($newFileName, $owner, 1, $this->entityIdAttribute) . '/' . $newFileName;
 
         if (!copy($filePath, $newFilePath)) {
             throw new Exception("Cannot copy file! {$filePath}  to {$newFilePath}");
@@ -110,22 +141,23 @@ class AttachmentBehavior extends Behavior {
 
         $file->loadDefaultValues();
         $file->setAttributes([
-            'name' => pathinfo($filePath, PATHINFO_FILENAME),
-            'entity_id' => $owner->id,
+            'entity_id' => $owner->$idAttribute,
             'entity_class' => $this->getEntityClass(),
             'entity_attribute' => $attribute,
             'hash' => $fileHash,
-            'size' => filesize($filePath),
+            'size' => filesize($newFilePath),
             'name' => $extras['name'] ?? $newFileName,
             'label' => $extras['label'] ?? "",
             'content' => $extras['content'] ?? "",
             'extension' => $fileType,
-            'mime_type' => FileHelper::getMimeType($filePath),
-            'logic_path' => $this->_organizer->getUploadLogicPath($fileHash, $owner),
+            'mime_type' => FileHelper::getMimeType($newFilePath),
+            'logic_path' => $this->_organizer->getUploadLogicPath($fileHash, $owner, 1, $this->entityIdAttribute),
         ]);
 
         if ($file->save()) {
-            @\unlink($filePath);
+            if ($this->config['delSrcFileAfterAttach']) {
+                @\unlink($filePath);
+            }
             return $file;
         } else {
             return false;
@@ -231,9 +263,11 @@ class AttachmentBehavior extends Behavior {
      */
     public function attachFile($filePath, $attribute, $extras = []) {
         $owner = $this->owner;
-        if (empty($owner->id)) {
+        $idAttribute = $this->entityIdAttribute;
+        if (empty($owner->$idAttribute)) {
             throw new Exception('Parent model must have ID when you attaching a file');
         }
+
         if (!\file_exists($filePath)) {
             throw new Exception("File {$filePath} not exists");
         }
@@ -241,38 +275,39 @@ class AttachmentBehavior extends Behavior {
         $fileHash = md5(microtime(true) . $filePath);
         $fileType = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
         $newFileName = "{$fileHash}.{$fileType}";
-
-        $fileDirPath = $this->getModule()->getFileDirPath($fileHash, $owner);
-        $newFilePath = $fileDirPath . DIRECTORY_SEPARATOR . $newFileName;
+        $newFilePath = $this->_organizer->getFullUploadStoreDir($newFileName, $owner, 1, $this->entityIdAttribute) . $newFileName;
 
         if (!copy($filePath, $newFilePath)) {
             throw new Exception("Cannot copy file! {$filePath}  to {$newFilePath}");
         }
+
         $file = new $this->attributesDefinition[$attribute]['class'];
         if (isset($this->attributesDefinition[$attribute]['enableVersions'])) {
             $file->setEnableVersions($this->attributesDefinition[$attribute]['enableVersions']);
         }
-
+        
         $file->loadDefaultValues();
         $file->setAttributes([
-            'name' => pathinfo($filePath, PATHINFO_FILENAME),
-            'entity_id' => $owner->id,
+            'entity_id' => $owner->$idAttribute,
             'entity_class' => $this->getEntityClass(),
             'entity_attribute' => $attribute,
             'hash' => $fileHash,
-            'size' => filesize($filePath),
-            'name' => $extras['name'] ?? "",
+            'size' => filesize($newFilePath),
+            'name' => $extras['name'] ?? $newFileName,
             'label' => $extras['label'] ?? "",
             'content' => $extras['content'] ?? "",
             'extension' => $fileType,
-            'mime_type' => FileHelper::getMimeType($filePath),
-            'logic_path' => $this->getModule()->getFileLogicPath($fileHash, $owner),
+            'mime_type' => FileHelper::getMimeType($newFilePath),
+            'logic_path' => $this->_organizer->getUploadLogicPath($fileHash, $owner, 1, $this->entityIdAttribute),
         ]);
 
         if ($file->save()) {
-            @\unlink($filePath);
+            if ($this->config['delSrcFileAfterAttach']) {
+                @\unlink($filePath);
+            }
             return $file;
         } else {
+
             return false;
         }
     }
@@ -283,9 +318,10 @@ class AttachmentBehavior extends Behavior {
      */
     public function getFiles($attribute, $order = ['id' => SORT_ASC]) {
         $modelClass = $this->attributesDefinition[$attribute]['class'];
+        $idAttribute = $this->entityIdAttribute;
         $fileQuery = $modelClass::find()
                 ->andWhere([
-            'entity_id' => $this->owner->id,
+            'entity_id' => $this->owner->$idAttribute,
             'entity_class' => $this->getEntityClass(),
             'entity_attribute' => $attribute,
         ]);
@@ -296,9 +332,10 @@ class AttachmentBehavior extends Behavior {
 
     public function getOneAttachment($attribute, $order = ['position' => SORT_DESC]) {
         $modelClass = $this->attributesDefinition[$attribute]['class'];
+        $idAttribute = $this->entityIdAttribute;
         $fileQuery = $modelClass::find()
                 ->andWhere([
-            'entity_id' => $this->owner->id,
+            'entity_id' => $this->owner->$idAttribute,
             'entity_class' => $this->getEntityClass(),
             'entity_attribute' => $attribute,
         ]);

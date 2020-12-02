@@ -73,10 +73,10 @@ class FolderOrganizer extends \yii\base\Component {
         return $userDirPath . '/';
     }
 
-    public function getFullUploadStoreDir($fileHash, $entityModel = null) {
+    public function getFullUploadStoreDir($fileHash, $entityModel = null, $depth = 1, $entityIdAttribute = 'id') {
         $path = strtr($this->fullUploadStoreDirPattern, [
             "{uploadDir}" => $this->getUploadStorePath() . '/',
-            "{logicPath}" => $this->getUploadLogicPath($fileHash, $entityModel),
+            "{logicPath}" => $this->getUploadLogicPath($fileHash, $entityModel, $depth, $entityIdAttribute),
             "{filename}" => "",
         ]);
         if (!\file_exists($path)) {
@@ -99,7 +99,7 @@ class FolderOrganizer extends \yii\base\Component {
         return $path;
     }
 
-    public function getUploadLogicPath($fileHash, $entityModel = null, $depth = 1) {
+    public function getUploadLogicPath($fileHash, $entityModel = null, $depth = 1, $entityIdAttribute = 'id') {
         if (isset($this->_data['LOGIC_PATH'][$fileHash])) {
             return $this->_data['LOGIC_PATH'][$fileHash];
         }
@@ -108,7 +108,7 @@ class FolderOrganizer extends \yii\base\Component {
         if (is_null($entityModel)) {
             $logicPath = $this->getSubDirs($fileHash, $depth) . '/';
         } else {
-            $logicPath = $entityModel->formName() . '/' . $entityModel->id . '/' . $this->getSubDirs($fileHash, $depth) . '/';
+            $logicPath = $entityModel->formName() . '/' . $entityModel->$entityIdAttribute . '/' . $this->getSubDirs($fileHash, $depth) . '/';
         }
         $this->_data['LOGIC_PATH'][$fileHash] = $logicPath;
         return $this->_data['LOGIC_PATH'][$fileHash];
@@ -202,9 +202,9 @@ class FolderOrganizer extends \yii\base\Component {
 
         if (!is_null($model)) {
             $cachingPath = preg_replace(array('/EntityFile/', '/EntityImage/'), array('', ''), basename($model->className()));
-            $cachingPath.='/' . $model->id;
+            $cachingPath .= '/' . $model->id;
 
-            $prefixPath.= '/' . $cachingPath;
+            $prefixPath .= '/' . $cachingPath;
             if (!file_exists($prefixPath)) {
                 if (!@mkdir($prefixPath, $createMode, true)) {
                     throw new Exception("Cannot create dir: {$prefixPath}");
