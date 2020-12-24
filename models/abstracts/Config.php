@@ -81,7 +81,11 @@ abstract class Config extends \cza\base\models\ActiveRecord {
 
     public function getDataToArray() {
         if (!isset($this->_data['custom_value'])) {
-            $this->_data['custom_value'] = \json_decode($this->custom_value, true);
+            if (empty($this->default_value)) {
+                $this->_data['custom_value'] = \json_decode($this->custom_value, true);
+            } else {
+                $this->_data['custom_value'] = ArrayHelper::merge(\json_decode($this->default_value, true), \json_decode($this->custom_value, true));
+            }
         }
         return $this->_data['custom_value'];
     }
@@ -89,9 +93,8 @@ abstract class Config extends \cza\base\models\ActiveRecord {
     /**
      * 获取custom_value 某个字段的值
      */
-    public function getDataItem($key) {
-        return ArrayHelper::getValue($this->getDataToArray(), $key);
+    public function getDataItem($key, $default = null) {
+        return ArrayHelper::getValue($this->getDataToArray(), $key, $default);
     }
-
 
 }
