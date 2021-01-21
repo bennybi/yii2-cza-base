@@ -58,7 +58,7 @@ class AttachmentBehavior extends Behavior {
     public $dirMode = 0775;
     public $entityIdAttribute = 'id';
     public $tempPath = '@runtime/uploads/temp';
-    public $config;
+    public $config = [];
     /*
      * accept attributes to class map, determine to crud related attachments
      * array, for example:
